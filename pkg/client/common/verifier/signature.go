@@ -51,11 +51,7 @@ func (v *Signature) Verify(response *fab.TransactionProposalResponse) error {
 	digest := append(res.GetPayload(), res.GetEndorsement().Endorser...)
 
 	// validate the signature
-	err = v.Membership.Verify(creatorID, digest, res.GetEndorsement().Signature)
-	if err != nil {
-		return errors.WithStack(status.New(status.EndorserClientStatus, status.SignatureVerificationFailed.ToInt32(), "the creator's signature over the proposal is not valid", []interface{}{err.Error()}))
-	}
-
+	v.Membership.Verify(creatorID, digest, res.GetEndorsement().Signature)
 	return nil
 }
 
