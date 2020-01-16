@@ -16,11 +16,11 @@ import (
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
-	ledgerutil "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/core/ledger/util"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	ledgerutil "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/core/ledger/util"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/options"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/pkg/errors"
 )
 

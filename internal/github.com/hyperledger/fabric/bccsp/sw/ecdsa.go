@@ -24,8 +24,8 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
 )
 
 func signECDSA(k *ecdsa.PrivateKey, digest []byte, opts bccsp.SignerOpts) ([]byte, error) {

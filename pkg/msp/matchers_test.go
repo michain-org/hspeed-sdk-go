@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config"
 	"github.com/stretchr/testify/assert"
 )
 

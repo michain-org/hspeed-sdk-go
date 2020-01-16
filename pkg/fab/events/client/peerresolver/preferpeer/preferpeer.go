@@ -9,14 +9,14 @@ package preferpeer
 import (
 	"strings"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/client/peerresolver"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/client/peerresolver/minblockheight"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/client/peerresolver/preferorg"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/service"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/options"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/events/client/peerresolver"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/events/client/peerresolver/minblockheight"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/events/client/peerresolver/preferorg"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/events/service"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")

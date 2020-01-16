@@ -15,11 +15,11 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/multi"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	contextImpl "github.com/hyperledger/fabric-sdk-go/pkg/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/txn"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/multi"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	contextImpl "github.com/michain-org/hspeed-sdk-go/pkg/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/txn"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")

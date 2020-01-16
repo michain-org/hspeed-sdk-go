@@ -10,14 +10,14 @@ import (
 	"context"
 	"sort"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/sorter/balancedsorter"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/sorter/blockheightsorter"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/selection/sorter/balancedsorter"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/selection/sorter/blockheightsorter"
 
-	discclient "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/discovery/client"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/balancer"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/options"
-	contextAPI "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	discclient "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/discovery/client"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/selection/balancer"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/selection/options"
+	contextAPI "github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 )
 
 type selectionFilter struct {

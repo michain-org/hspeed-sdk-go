@@ -12,10 +12,10 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric-protos-go/common"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/status"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/pkg/errors"
 )
 
@@ -51,7 +51,11 @@ func (v *Signature) Verify(response *fab.TransactionProposalResponse) error {
 	digest := append(res.GetPayload(), res.GetEndorsement().Endorser...)
 
 	// validate the signature
-	v.Membership.Verify(creatorID, digest, res.GetEndorsement().Signature)
+	err = v.Membership.Verify(creatorID, digest, res.GetEndorsement().Signature)
+	if err != nil {
+		return errors.WithStack(status.New(status.EndorserClientStatus, status.SignatureVerificationFailed.ToInt32(), "the creator's signature over the proposal is not valid", []interface{}{err.Error()}))
+	}
+
 	return nil
 }
 

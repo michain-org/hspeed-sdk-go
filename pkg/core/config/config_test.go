@@ -12,11 +12,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/cryptosuite"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/test"
-	"github.com/hyperledger/fabric-sdk-go/test/metadata"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/cryptosuite"
+	"github.com/michain-org/hspeed-sdk-go/pkg/util/test"
+	"github.com/michain-org/hspeed-sdk-go/test/metadata"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"

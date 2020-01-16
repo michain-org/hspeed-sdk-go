@@ -12,9 +12,9 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/test/mockcore"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/test/mockcore"
 )
 
 func TestBadConfig(t *testing.T) {

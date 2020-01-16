@@ -11,14 +11,14 @@ import (
 
 	"encoding/json"
 
-	caapi "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/api"
-	calib "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/lib"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/lib/client/credential"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/lib/client/credential/x509"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
-	"github.com/hyperledger/fabric-sdk-go/pkg/msp/api"
+	caapi "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric-ca/api"
+	calib "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric-ca/lib"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric-ca/lib/client/credential"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric-ca/lib/client/credential/x509"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/msp"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/endpoint"
+	"github.com/michain-org/hspeed-sdk-go/pkg/msp/api"
 )
 
 // fabricCAAdapter translates between SDK lingo and native Fabric CA API

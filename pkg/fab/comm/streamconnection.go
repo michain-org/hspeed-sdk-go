@@ -11,10 +11,10 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
-	fabcontext "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/verifier"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/options"
+	fabcontext "github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/peer"

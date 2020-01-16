@@ -10,11 +10,11 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/service/blockfilter"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/events/service/dispatcher"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/options"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/events/service/blockfilter"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/events/service/dispatcher"
 	"github.com/pkg/errors"
 )
 

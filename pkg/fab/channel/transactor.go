@@ -12,11 +12,11 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	contextImpl "github.com/hyperledger/fabric-sdk-go/pkg/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/txn"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	contextImpl "github.com/michain-org/hspeed-sdk-go/pkg/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/endpoint"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/txn"
 )
 
 // Transactor enables sending transactions and transaction proposals on the channel.

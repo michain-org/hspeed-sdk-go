@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package retry
 
 import (
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/multi"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/multi"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
 )
 
 var logger = logging.NewLogger("fabsdk/common")
@@ -67,6 +67,7 @@ func (ri *RetryableInvoker) Invoke(invocation Invocation) (interface{}, error) {
 			}
 			return retval, nil
 		}
+
 		logger.Debugf("Failed with err [%s] on attempt #%d. Checking if retry is warranted...", err, attemptNum)
 		if !ri.resolveRetry(err) {
 			if lastErr != nil && lastErr.Error() != err.Error() {

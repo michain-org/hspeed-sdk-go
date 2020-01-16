@@ -10,8 +10,8 @@ import (
 	"crypto/x509"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/options"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/spf13/cast"
 	"google.golang.org/grpc/keepalive"
 )
