@@ -24,12 +24,12 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 	"io/ioutil"
 	"net"
 	"strings"
 	"time"
 
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
 )
 
