@@ -11,6 +11,7 @@ Please review third_party pinning scripts and patches for more details.
 package msp
 
 import (
+	"crypto/ecdsa"
 	"encoding/pem"
 	"io/ioutil"
 	"os"
@@ -18,6 +19,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
@@ -275,9 +278,30 @@ func getMspConfig(dir string, ID string, sigid *msp.SigningIdentityInfo) (*msp.M
 	}
 
 	// Set FabricCryptoConfig
-	cryptoConfig := &msp.FabricCryptoConfig{
-		SignatureHashFamily:            bccsp.SHA2,
-		IdentityIdentifierHashFunction: bccsp.SHA256,
+	// TODO
+	cryptoConfig := &msp.FabricCryptoConfig{}
+	if len(cacerts) > 0 {
+		cert, err := getCertificateFromPem(cacerts[0])
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed getCertificateFromPem")
+		}
+		switch cert.PublicKey.(type) {
+		case *ecdsa.PublicKey:
+			cryptoConfig = &msp.FabricCryptoConfig{
+				SignatureHashFamily:            bccsp.SHA2,
+				IdentityIdentifierHashFunction: bccsp.SHA256,
+			}
+		case *sm2.PublicKey:
+			cryptoConfig = &msp.FabricCryptoConfig{
+				SignatureHashFamily:            bccsp.SM3,
+				IdentityIdentifierHashFunction: bccsp.GMSM3,
+			}
+		default:
+			cryptoConfig = &msp.FabricCryptoConfig{
+				SignatureHashFamily:            bccsp.SHA2,
+				IdentityIdentifierHashFunction: bccsp.SHA256,
+			}
+		}
 	}
 
 	// Compose FabricMSPConfig
@@ -321,3 +345,15 @@ const (
 	IdemixConfigFileRevocationPublicKey = "RevocationPublicKey"
 	IdemixConfigFileSigner              = "SignerConfig"
 )
+
+func getCertificateFromPem(rawCert []byte) (*x509.Certificate, error) {
+	block, _ := pem.Decode(rawCert)
+	if block == nil || block.Type != "CERTIFICATE" {
+		return nil, errors.Errorf("Wrong PEM encoding")
+	}
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return nil, errors.Errorf("Wrong DER encoding")
+	}
+	return cert, nil
+}

@@ -7,11 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 package comm
 
 import (
-	"crypto/x509"
 	"sync/atomic"
 
 	"github.com/pkg/errors"
 
+	"github.com/hyperledger/fabric-sdk-go/gm/gmcredentials"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
@@ -21,7 +22,6 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm"
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")
@@ -55,7 +55,9 @@ func NewConnection(ctx fabcontext.Client, url string, opts ...options.Opt) (*GRP
 		return nil, err
 	}
 
-	reqCtx, cancel := context.NewRequest(ctx, context.WithTimeout(params.connectTimeout))
+	reqCtx, cancel := context.NewRequest(ctx,
+		context.WithTimeout(params.connectTimeout),
+		context.WithParent(params.parentContext))
 	defer cancel()
 
 	commManager, ok := context.RequestCommManager(reqCtx)
@@ -137,7 +139,7 @@ func newDialOpts(config fab.EndpointConfig, url string, params *params) ([]grpc.
 			return verifier.VerifyPeerCertificate(rawCerts, verifiedChains)
 		}
 
-		dialOpts = append(dialOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		dialOpts = append(dialOpts, grpc.WithTransportCredentials(gmcredentials.NewTLS(tlsConfig)))
 		logger.Debugf("Creating a secure connection to [%s] with TLS HostOverride [%s]", url, params.hostOverride)
 	} else {
 		logger.Debugf("Creating an insecure connection [%s]", url)

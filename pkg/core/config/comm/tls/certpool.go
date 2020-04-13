@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
 package tls
 
 import (
-	"crypto/x509"
 	"sync"
 	"sync/atomic"
 
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 )

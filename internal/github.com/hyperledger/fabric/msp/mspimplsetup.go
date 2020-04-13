@@ -12,13 +12,13 @@ package msp
 
 import (
 	"bytes"
-	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	m "github.com/hyperledger/fabric-protos-go/msp"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	bccsp "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
 	errors "github.com/pkg/errors"
 )
@@ -154,7 +154,7 @@ func (msp *bccspmsp) setupCAs(conf *m.FabricMSPConfig) error {
 		msp.intermediateCerts[i] = id
 	}
 
-	// root CA and intermediate CA certificates are sanitized, they can be reimported
+	// root CA and intermediate CA certificates are sanitized, they can be re-imported
 	msp.opts = &x509.VerifyOptions{Roots: x509.NewCertPool(), Intermediates: x509.NewCertPool()}
 	for _, id := range msp.rootCerts {
 		msp.opts.Roots.AddCert(id.(*identity).cert)

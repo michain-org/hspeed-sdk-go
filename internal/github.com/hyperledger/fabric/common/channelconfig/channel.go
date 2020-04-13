@@ -143,7 +143,7 @@ func (cc *ChannelConfig) ConsortiumsConfig() *ConsortiumsConfig {
 	return cc.consortiumsConfig
 }
 
-// HashingAlgorithm returns a function pointer to the chain hashing algorihtm
+// HashingAlgorithm returns a function pointer to the chain hashing algorithm
 func (cc *ChannelConfig) HashingAlgorithm() func(input []byte) []byte {
 	return cc.hashingAlgorithm
 }
@@ -195,6 +195,8 @@ func (cc *ChannelConfig) validateHashingAlgorithm() error {
 		cc.hashingAlgorithm = util.ComputeSHA256
 	case bccsp.SHA3_256:
 		cc.hashingAlgorithm = util.ComputeSHA3256
+	case bccsp.GMSM3:
+		cc.hashingAlgorithm = util.ComputeSM3
 	default:
 		return fmt.Errorf("Unknown hashing algorithm type: %s", cc.protos.HashingAlgorithm.Name)
 	}

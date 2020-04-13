@@ -23,15 +23,15 @@ package util
 import (
 	"crypto"
 	"crypto/ecdsa"
-	"crypto/rsa"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
 	"io/ioutil"
 	"strings"
 
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 
 	"github.com/cloudflare/cfssl/csr"
@@ -42,25 +42,13 @@ import (
 )
 
 // getBCCSPKeyOpts generates a key as specified in the request.
-// This supports ECDSA and RSA.
+// This supports ECDSA.
 func getBCCSPKeyOpts(kr csr.KeyRequest, ephemeral bool) (opts core.KeyGenOpts, err error) {
 	if kr == nil {
 		return factory.GetECDSAKeyGenOpts(ephemeral), nil
 	}
 	log.Debugf("generate key from request: algo=%s, size=%d", kr.Algo(), kr.Size())
 	switch kr.Algo() {
-	case "rsa":
-		switch kr.Size() {
-		case 2048:
-			return factory.GetRSA2048KeyGenOpts(ephemeral), nil
-		case 3072:
-			return factory.GetRSA3072KeyGenOpts(ephemeral), nil
-		case 4096:
-			return factory.GetRSA4096KeyGenOpts(ephemeral), nil
-		default:
-			// Need to add a way to specify arbitrary RSA key size to bccsp
-			return nil, errors.Errorf("Invalid RSA key size: %d", kr.Size())
-		}
 	case "ecdsa":
 		switch kr.Size() {
 		case 256:
@@ -121,8 +109,8 @@ func GetSignerFromCertFile(certFile string, csp core.CryptoSuite) (core.Key, cry
 		return nil, nil, nil, err
 	}
 	// Get the signer from the cert
-	key, cspSigner, err := GetSignerFromCert(parsedCa, csp)
-	return key, cspSigner, parsedCa, err
+	key, cspSigner, err := GetSignerFromCert(x509.ToCert(parsedCa), csp)
+	return key, cspSigner, x509.ToCert(parsedCa), err
 }
 
 // BCCSPKeyRequestGenerate generates keys through BCCSP
@@ -176,8 +164,16 @@ func ImportBCCSPKeyFromPEMBytes(keyBuff []byte, myCSP core.CryptoSuite, temporar
 			return nil, errors.WithMessage(err, fmt.Sprintf("Failed to import ECDSA private key for '%s'", keyFile))
 		}
 		return sk, nil
-	case *rsa.PrivateKey:
-		return nil, errors.Errorf("Failed to import RSA key from %s; RSA private key import is not supported", keyFile)
+	case *sm2.PrivateKey:
+		priv, err := factory.PrivateKeyToDER(key.(*sm2.PrivateKey))
+		if err != nil {
+			return nil, errors.WithMessage(err, fmt.Sprintf("Failed to convert SM2 private key for '%s'", keyFile))
+		}
+		sk, err := myCSP.KeyImport(priv, factory.GetSM2PrivateKeyImportOpts(temporary))
+		if err != nil {
+			return nil, errors.WithMessage(err, fmt.Sprintf("Failed to import SM2 private key for '%s'", keyFile))
+		}
+		return sk, nil
 	default:
 		return nil, errors.Errorf("Failed to import key from %s: invalid secret key type", keyFile)
 	}

@@ -7,11 +7,11 @@ SPDX-License-Identifier: Apache-2.0
 package fab
 
 import (
-	"crypto/tls"
 	"time"
 
 	"github.com/pkg/errors"
 
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 )
 
@@ -49,7 +49,7 @@ type orderersConfig interface {
 
 // ordererConfig interface allows to uniquely override EndpointConfig interface's OrdererConfig() function
 type ordererConfig interface {
-	OrdererConfig(name string) (*fab.OrdererConfig, bool)
+	OrdererConfig(name string) (*fab.OrdererConfig, bool, bool)
 }
 
 // peersConfig interface allows to uniquely override EndpointConfig interface's PeersConfig() function

@@ -8,9 +8,10 @@ package fab
 
 import (
 	reqContext "context"
-	"crypto/tls"
-	"crypto/x509"
 	"time"
+
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
@@ -93,7 +94,7 @@ type CommManager interface {
 type EndpointConfig interface {
 	Timeout(TimeoutType) time.Duration
 	OrderersConfig() []OrdererConfig
-	OrdererConfig(nameOrURL string) (*OrdererConfig, bool)
+	OrdererConfig(nameOrURL string) (*OrdererConfig, bool, bool)
 	PeersConfig(org string) ([]PeerConfig, bool)
 	PeerConfig(nameOrURL string) (*PeerConfig, bool)
 	NetworkConfig() *NetworkConfig

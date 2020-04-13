@@ -7,13 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 package endpoint
 
 import (
-	"crypto/x509"
 	"encoding/pem"
 	"io/ioutil"
 	"strings"
 
 	"regexp"
 
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/pkg/errors"
 )
 

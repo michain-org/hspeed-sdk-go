@@ -8,10 +8,10 @@ SPDX-License-Identifier: Apache-2.0
 package verifier
 
 import (
-	"crypto/x509"
 	"time"
 
 	"github.com/hyperledger/fabric-protos-go/common"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
@@ -51,7 +51,11 @@ func (v *Signature) Verify(response *fab.TransactionProposalResponse) error {
 	digest := append(res.GetPayload(), res.GetEndorsement().Endorser...)
 
 	// validate the signature
-	v.Membership.Verify(creatorID, digest, res.GetEndorsement().Signature)
+	err = v.Membership.Verify(creatorID, digest, res.GetEndorsement().Signature)
+	if err != nil {
+		return errors.WithStack(status.New(status.EndorserClientStatus, status.SignatureVerificationFailed.ToInt32(), "the creator's signature over the proposal is not valid", []interface{}{err.Error()}))
+	}
+
 	return nil
 }
 

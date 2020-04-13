@@ -8,7 +8,6 @@ package orderer
 
 import (
 	reqContext "context"
-	"crypto/x509"
 	"io"
 	"time"
 
@@ -16,12 +15,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 	grpcstatus "google.golang.org/grpc/status"
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	ab "github.com/hyperledger/fabric-protos-go/orderer"
+	"github.com/hyperledger/fabric-sdk-go/gm/gmcredentials"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
@@ -85,7 +85,7 @@ func New(config fab.EndpointConfig, opts ...Option) (*Orderer, error) {
 			return verifier.VerifyPeerCertificate(rawCerts, verifiedChains)
 		}
 
-		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig)))
+		grpcOpts = append(grpcOpts, grpc.WithTransportCredentials(gmcredentials.NewTLS(tlsConfig)))
 	} else {
 		grpcOpts = append(grpcOpts, grpc.WithInsecure())
 	}
@@ -165,7 +165,11 @@ func FromOrdererConfig(ordererCfg *fab.OrdererConfig) Option {
 // by name from the apiconfig.Config supplied to the constructor, and then constructs a new orderer from it
 func FromOrdererName(name string) Option {
 	return func(o *Orderer) error {
-		ordererCfg, found := o.config.OrdererConfig(name)
+		ordererCfg, found, ignoreOrderer := o.config.OrdererConfig(name)
+		if ignoreOrderer {
+			return errors.Errorf("orderer config is ignoring orderer : %s by EntityMatchers", name)
+		}
+
 		if !found {
 			return errors.Errorf("orderer config not found for orderer : %s", name)
 		}

@@ -12,13 +12,13 @@ package msp
 
 import (
 	"bytes"
-	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/hex"
 	"encoding/pem"
 
 	"github.com/golang/protobuf/proto"
 	m "github.com/hyperledger/fabric-protos-go/msp"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	factory "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/pkg/errors"
@@ -130,7 +130,7 @@ func newBccspMsp(version MSPVersion, defaultBCCSP core.CryptoSuite) (MSP, error)
 		theMsp.internalValidateIdentityOusFunc = theMsp.validateIdentityOUsV11
 		theMsp.internalSatisfiesPrincipalInternalFunc = theMsp.satisfiesPrincipalInternalV13
 		theMsp.internalSetupAdmin = theMsp.setupAdminsPreV142
-	case MSPv1_4_2:
+	case MSPv1_4_3:
 		theMsp.internalSetupFunc = theMsp.setupV142
 		theMsp.internalValidateIdentityOusFunc = theMsp.validateIdentityOUsV142
 		theMsp.internalSatisfiesPrincipalInternalFunc = theMsp.satisfiesPrincipalInternalV142
@@ -406,7 +406,7 @@ func (msp *bccspmsp) deserializeIdentityInternal(serializedIdentity []byte) (Ide
 	return newIdentity(cert, pub, msp)
 }
 
-// SatisfiesPrincipal returns null if the identity matches the principal or an error otherwise
+// SatisfiesPrincipal returns nil if the identity matches the principal or an error otherwise
 func (msp *bccspmsp) SatisfiesPrincipal(id Identity, principal *m.MSPPrincipal) error {
 	principals, err := collectPrincipals(principal, msp.GetVersion())
 	if err != nil {

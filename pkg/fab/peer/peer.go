@@ -9,12 +9,11 @@ package peer
 import (
 	reqContext "context"
 
-	"crypto/x509"
-
 	"github.com/spf13/cast"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"

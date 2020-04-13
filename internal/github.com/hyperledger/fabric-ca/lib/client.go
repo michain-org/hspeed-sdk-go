@@ -151,7 +151,7 @@ func (c *Client) initHTTPClient(serverName string) error {
 		//set the host name override
 		tlsConfig.ServerName = serverName
 
-		tr.TLSClientConfig = tlsConfig
+		tr.TLSClientConfig = nil
 	}
 	c.httpClient = &http.Client{Transport: tr}
 	return nil

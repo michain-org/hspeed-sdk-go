@@ -9,12 +9,11 @@ package cryptoutil
 import (
 	"crypto"
 	"crypto/ecdsa"
-	"crypto/rsa"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/pem"
 	"io"
 
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 	"github.com/pkg/errors"
@@ -102,8 +101,6 @@ func X509KeyPair(certPEMBlock []byte, pk core.Key, cs core.CryptoSuite) (tls.Cer
 	}
 
 	switch x509Cert.PublicKey.(type) {
-	case *rsa.PublicKey:
-		cert.PrivateKey = &PrivateKey{cs, pk, &rsa.PublicKey{}}
 	case *ecdsa.PublicKey:
 		cert.PrivateKey = &PrivateKey{cs, pk, &ecdsa.PublicKey{}}
 	default:

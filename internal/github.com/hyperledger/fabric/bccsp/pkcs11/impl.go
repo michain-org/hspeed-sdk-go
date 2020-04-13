@@ -12,7 +12,6 @@ package pkcs11
 
 import (
 	"crypto/ecdsa"
-	"crypto/rsa"
 	"crypto/x509"
 	"os"
 
@@ -53,7 +52,7 @@ func New(opts PKCS11Opts, keyStore bccsp.KeyStore) (bccsp.BCCSP, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed initializing PKCS11 context")
 	}
-	csp := &impl{BCCSP: swCSP, conf: conf, ks: keyStore, softVerify: opts.SoftVerify, pkcs11Ctx: pkcs11Ctx}
+	csp := &impl{BCCSP: swCSP, conf: conf, softVerify: opts.SoftVerify, pkcs11Ctx: pkcs11Ctx}
 	return csp, nil
 }
 
@@ -61,7 +60,6 @@ type impl struct {
 	bccsp.BCCSP
 
 	conf *config
-	ks   bccsp.KeyStore
 
 	pkcs11Ctx  *sdkp11.ContextHandle
 	softVerify bool
@@ -133,10 +131,8 @@ func (csp *impl) KeyImport(raw interface{}, opts bccsp.KeyImportOpts) (k bccsp.K
 		switch pk.(type) {
 		case *ecdsa.PublicKey:
 			return csp.KeyImport(pk, &bccsp.ECDSAGoPublicKeyImportOpts{Temporary: opts.Ephemeral()})
-		case *rsa.PublicKey:
-			return csp.KeyImport(pk, &bccsp.RSAGoPublicKeyImportOpts{Temporary: opts.Ephemeral()})
 		default:
-			return nil, errors.New("Certificate's public key type not recognized. Supported keys: [ECDSA, RSA]")
+			return nil, errors.New("Certificate's public key type not recognized. Supported keys: [ECDSA]")
 		}
 
 	default:

@@ -11,9 +11,10 @@ Please review third_party pinning scripts and patches for more details.
 package comm
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"time"
+
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/metrics"
 	flogging "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/logbridge"

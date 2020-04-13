@@ -21,10 +21,10 @@ Please review third_party pinning scripts and patches for more details.
 package tls
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"time"
 
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
 
 	factory "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/sdkpatch/cryptosuitebridge"
@@ -83,6 +83,7 @@ func GetClientTLSConfig(cfg *ClientTLSConfig, csp core.CryptoSuite) (*tls.Config
 	if len(cfg.CertFiles) == 0 {
 		return nil, errors.New("No trusted root certificates for TLS were provided")
 	}
+
 
 	for _, cacert := range cfg.CertFiles {
 		ok := rootCAPool.AppendCertsFromPEM(cacert)

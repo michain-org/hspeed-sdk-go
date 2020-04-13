@@ -12,8 +12,6 @@ package cryptosuitebridge
 
 import (
 	"crypto"
-	"crypto/ecdsa"
-
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	cspsigner "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/signer"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
@@ -26,11 +24,6 @@ const (
 	ECDSAP256        = bccsp.ECDSAP256
 	ECDSAP384        = bccsp.ECDSAP384
 	ECDSAReRand      = bccsp.ECDSAReRand
-	RSA              = bccsp.RSA
-	RSA1024          = bccsp.RSA1024
-	RSA2048          = bccsp.RSA2048
-	RSA3072          = bccsp.RSA3072
-	RSA4096          = bccsp.RSA4096
 	AES              = bccsp.AES
 	AES128           = bccsp.AES128
 	AES192           = bccsp.AES192
@@ -44,6 +37,7 @@ const (
 	SHA384           = bccsp.SHA384
 	SHA3_256         = bccsp.SHA3_256
 	SHA3_384         = bccsp.SHA3_384
+	SM3              = bccsp.SM3
 	X509Certificate  = bccsp.X509Certificate
 )
 
@@ -58,7 +52,7 @@ func PEMtoPrivateKey(raw []byte, pwd []byte) (interface{}, error) {
 }
 
 // PrivateKeyToDER marshals is bridge for utils.PrivateKeyToDER
-func PrivateKeyToDER(privateKey *ecdsa.PrivateKey) ([]byte, error) {
+func PrivateKeyToDER(privateKey interface{}) ([]byte, error) {
 	return utils.PrivateKeyToDER(privateKey)
 }
 
@@ -77,21 +71,6 @@ func GetSHA256Opts() core.HashOpts {
 	return &bccsp.SHA256Opts{}
 }
 
-//GetRSA2048KeyGenOpts returns options for RSA key generation at 2048 security.
-func GetRSA2048KeyGenOpts(ephemeral bool) core.KeyGenOpts {
-	return &bccsp.RSA2048KeyGenOpts{Temporary: ephemeral}
-}
-
-//GetRSA3072KeyGenOpts returns options for RSA key generation at 3072 security.
-func GetRSA3072KeyGenOpts(ephemeral bool) core.KeyGenOpts {
-	return &bccsp.RSA3072KeyGenOpts{Temporary: ephemeral}
-}
-
-//GetRSA4096KeyGenOpts returns options for RSA key generation at 4096 security.
-func GetRSA4096KeyGenOpts(ephemeral bool) core.KeyGenOpts {
-	return &bccsp.RSA4096KeyGenOpts{Temporary: ephemeral}
-}
-
 // GetECDSAKeyGenOpts returns options for ECDSA key generation.
 func GetECDSAKeyGenOpts(ephemeral bool) core.KeyGenOpts {
 	return &bccsp.ECDSAKeyGenOpts{Temporary: ephemeral}
@@ -107,6 +86,10 @@ func GetECDSAP384KeyGenOpts(ephemeral bool) core.KeyGenOpts {
 	return &bccsp.ECDSAP384KeyGenOpts{Temporary: ephemeral}
 }
 
+func GetSM2KeyGenOpts(ephemeral bool) core.KeyGenOpts {
+	return &bccsp.SM2KeyGenOpts{Temporary: ephemeral}
+}
+
 //GetX509PublicKeyImportOpts options for importing public keys from an x509 certificate
 func GetX509PublicKeyImportOpts(ephemeral bool) core.KeyImportOpts {
 	return &bccsp.X509PublicKeyImportOpts{Temporary: ephemeral}
@@ -116,4 +99,8 @@ func GetX509PublicKeyImportOpts(ephemeral bool) core.KeyImportOpts {
 // or PKCS#8 format.
 func GetECDSAPrivateKeyImportOpts(ephemeral bool) core.KeyImportOpts {
 	return &bccsp.ECDSAPrivateKeyImportOpts{Temporary: ephemeral}
+}
+
+func GetSM2PrivateKeyImportOpts(ephemeral bool) core.KeyImportOpts {
+	return &bccsp.SM2PrivateKeyImportOpts{Temporary: ephemeral}
 }

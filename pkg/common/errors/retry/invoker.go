@@ -67,6 +67,7 @@ func (ri *RetryableInvoker) Invoke(invocation Invocation) (interface{}, error) {
 			}
 			return retval, nil
 		}
+
 		logger.Debugf("Failed with err [%s] on attempt #%d. Checking if retry is warranted...", err, attemptNum)
 		if !ri.resolveRetry(err) {
 			if lastErr != nil && lastErr.Error() != err.Error() {

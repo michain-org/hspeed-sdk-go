@@ -23,7 +23,6 @@ package msp
 import (
 	"bytes"
 	"crypto/ecdsa"
-	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
 	"encoding/pem"
@@ -31,6 +30,7 @@ import (
 	"math/big"
 	"time"
 
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
 	"github.com/pkg/errors"
 )

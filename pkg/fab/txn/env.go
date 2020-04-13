@@ -17,10 +17,10 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/common/crypto"
 	contextApi "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/cryptosuite"
 )
 
 // TransactionHeader contains metadata for a transaction created by the SDK.
@@ -78,7 +78,7 @@ func NewHeader(ctx contextApi.Client, channelID string, opts ...fab.TxnHeaderOpt
 		}
 	}
 
-	ho := cryptosuite.GetSHA256Opts() // TODO: make configurable
+	ho := &bccsp.SHA256Opts{} // TODO: SM3
 	h, err := ctx.CryptoSuite().GetHash(ho)
 	if err != nil {
 		return nil, errors.WithMessage(err, "hash function creation failed")

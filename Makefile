@@ -48,7 +48,7 @@ FABRIC_SDKGO_TEST_CHANGED  ?= false
 FABRIC_SDKGO_TESTRUN_ID    ?= $(shell date +'%Y%m%d%H%M%S')
 
 # Dev tool versions (overridable)
-GOLANGCI_LINT_VER ?= v1.17.1
+GOLANGCI_LINT_VER ?= v1.19.1
 
 # Fabric tool versions (overridable)
 FABRIC_TOOLS_VERSION ?= $(FABRIC_STABLE_VERSION)
@@ -63,14 +63,13 @@ FABRIC_DEV_REGISTRY         ?= nexus3.hyperledger.org:10001
 FABRIC_DEV_REGISTRY_PRE_CMD ?= docker login -u docker -p docker nexus3.hyperledger.org:10001
 
 # Base image variables for socat and softshm builds
-BASE_UBUNTU_VERSION = "xenial"
-BASE_GO_VERSION = "1.12.5"
+BASE_GO_VERSION = "1.13"
 
 # Upstream fabric patching (overridable)
 THIRDPARTY_FABRIC_CA_BRANCH ?= master
-THIRDPARTY_FABRIC_CA_COMMIT ?= 233a4749c83b96a9dddfba97a358d55c974e586d
+THIRDPARTY_FABRIC_CA_COMMIT ?= 02fe02b0a6f224aac8ac6fd813cecc590ec2a024
 THIRDPARTY_FABRIC_BRANCH    ?= master
-THIRDPARTY_FABRIC_COMMIT    ?= fedb583e7cb2998fef986a2a1a609f1f90beb983
+THIRDPARTY_FABRIC_COMMIT    ?= v2.0.0-beta
 
 # Force removal of images in cleanup (overridable)
 FIXTURE_DOCKER_REMOVE_FORCE ?= false
@@ -152,7 +151,8 @@ FABRIC_TOOLS_DEVSTABLE_TAG  := stable
 ifdef JENKINS_URL
 export FABRIC_SDKGO_DEPEND_INSTALL=true
 FABRIC_SDK_CHAINCODED            := true
-FABRIC_SDKGO_TEST_CHANGED        := true
+# TODO: disabled FABRIC_SDKGO_TEST_CHANGED optimization - while tests are being fixed.
+FABRIC_SDKGO_TEST_CHANGED        := false
 FABRIC_SDK_DEPRECATED_UNITTEST   := false
 FABRIC_STABLE_INTTEST            := true
 FABRIC_STABLE_PKCS11_INTTEST     := true
@@ -277,15 +277,8 @@ lint-all: version populate-noforce
 .PHONY: build-softhsm2-image
 build-softhsm2-image:
 	 @$(DOCKER_CMD) build --no-cache -q -t "fabsdkgo-softhsm2" \
-		--build-arg BASE_UBUNTU_VERSION=$(BASE_UBUNTU_VERSION) \
 		--build-arg BASE_GO_VERSION=$(BASE_GO_VERSION) \
 		-f $(FIXTURE_SOFTHSM2_PATH)/Dockerfile .
-
-.PHONY: build-socat-image
-build-socat-image:
-	 @$(DOCKER_CMD) build --no-cache -q -t "fabsdkgo-socat" \
-		--build-arg BASE_UBUNTU_VERSION=$(BASE_UBUNTU_VERSION) \
-		-f $(FIXTURE_SOCAT_PATH)/Dockerfile .
 
 .PHONY: unit-test
 unit-test: clean-tests depend-noforce populate-noforce license lint-submodules
@@ -571,8 +564,11 @@ endif
 .PHONY: thirdparty-pin
 thirdparty-pin:
 	@echo "Pinning third party packages ..."
-	@UPSTREAM_COMMIT=$(THIRDPARTY_FABRIC_COMMIT) UPSTREAM_BRANCH=$(THIRDPARTY_FABRIC_BRANCH) scripts/third_party_pins/fabric/apply_upstream.sh
-	@UPSTREAM_COMMIT=$(THIRDPARTY_FABRIC_CA_COMMIT) UPSTREAM_BRANCH=$(THIRDPARTY_FABRIC_CA_BRANCH) scripts/third_party_pins/fabric-ca/apply_upstream.sh
+	@THIRDPARTY_FABRIC_COMMIT=$(THIRDPARTY_FABRIC_COMMIT) \
+	THIRDPARTY_FABRIC_BRANCH=$(THIRDPARTY_FABRIC_BRANCH) \
+	THIRDPARTY_FABRIC_CA_COMMIT=$(THIRDPARTY_FABRIC_CA_COMMIT) \
+	THIRDPARTY_FABRIC_CA_BRANCH=$(THIRDPARTY_FABRIC_CA_BRANCH) \
+	scripts/third_party_pins/apply_thirdparty_pins.sh
 
 .PHONY: populate
 populate: populate-vendor populate-fixtures-stable

@@ -10,6 +10,7 @@ import (
 	"crypto/sha256"
 	"strconv"
 
+	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm3"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 )
@@ -27,7 +28,7 @@ func newCtxtCacheKey(ctx fab.ClientContext) (*ctxtCacheKey, error) {
 		return nil, err
 	}
 
-	h := sha256.New()
+	h := sm3.New()
 	if _, err := h.Write(identity); err != nil {
 		return nil, err
 	}

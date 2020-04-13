@@ -7,7 +7,6 @@ SPDX-License-Identifier: Apache-2.0
 package mocks
 
 import (
-	"crypto/tls"
 	"path/filepath"
 	"time"
 
@@ -15,8 +14,8 @@ import (
 	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
 	"github.com/hyperledger/fabric-sdk-go/test/metadata"
 
-	"crypto/x509"
-
+	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
+	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/test/mockfab"
@@ -181,7 +180,7 @@ func (c *MockConfig) SecurityProviderLibPath() string {
 
 // OrderersConfig returns a list of defined orderers
 func (c *MockConfig) OrderersConfig() []fab.OrdererConfig {
-	oConfig, _ := c.OrdererConfig("")
+	oConfig, _, _ := c.OrdererConfig("")
 	return []fab.OrdererConfig{*oConfig}
 }
 
@@ -206,18 +205,18 @@ func (c *MockConfig) SetCustomRandomOrdererCfg(customRandomOrdererCfg *fab.Order
 }
 
 // OrdererConfig not implemented
-func (c *MockConfig) OrdererConfig(name string) (*fab.OrdererConfig, bool) {
+func (c *MockConfig) OrdererConfig(name string) (*fab.OrdererConfig, bool, bool) {
 	if name == "Invalid" {
-		return nil, false
+		return nil, false, false
 	}
 	if c.customOrdererCfg != nil {
-		return c.customOrdererCfg, true
+		return c.customOrdererCfg, true, false
 	}
 	oConfig := fab.OrdererConfig{
 		URL: "example.com",
 	}
 
-	return &oConfig, true
+	return &oConfig, true, false
 }
 
 // KeyStorePath ...
@@ -294,7 +293,7 @@ func (c *MockConfig) ChannelOrderers(name string) []fab.OrdererConfig {
 		return nil
 	}
 
-	oConfig, _ := c.OrdererConfig("")
+	oConfig, _, _ := c.OrdererConfig("")
 
 	return []fab.OrdererConfig{*oConfig}
 }

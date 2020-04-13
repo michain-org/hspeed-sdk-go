@@ -7,22 +7,23 @@ SPDX-License-Identifier: Apache-2.0
 package invoke
 
 import (
-	"github.com/golang/protobuf/proto"
-	pb "github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
 	selectopts "github.com/hyperledger/fabric-sdk-go/pkg/client/common/selection/options"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
 	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
 	"github.com/hyperledger/fabric-sdk-go/pkg/fab/peer"
 	"github.com/pkg/errors"
+
+	"github.com/golang/protobuf/proto"
+	pb "github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/core/ledger/kvledger/txmgmt/rwsetutil"
+	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
 )
 
 var logger = logging.NewLogger("fabsdk/client")
 
 var lsccFilter = func(ccID string) bool {
-	return ccID != "lscc"
+	return ccID != "lscc" && ccID != "_lifecycle"
 }
 
 // SelectAndEndorseHandler selects endorsers according to the policies of the chaincodes in the provided invocation chain
@@ -56,6 +57,7 @@ func (e *SelectAndEndorseHandler) Handle(requestContext *RequestContext, clientC
 	}
 
 	e.EndorsementHandler.Handle(requestContext, clientContext)
+
 	if requestContext.Error != nil {
 		return
 	}
@@ -83,6 +85,7 @@ func (e *SelectAndEndorseHandler) Handle(requestContext *RequestContext, clientC
 			}
 		}
 	}
+
 	if e.next != nil {
 		e.next.Handle(requestContext, clientContext)
 	}
