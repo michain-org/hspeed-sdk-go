@@ -20,15 +20,15 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/hyperledger/fabric-sdk-go/gm/gmcredentials"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmcredentials"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/verifier"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/status"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/comm"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/endpoint"
 )
 
 const (

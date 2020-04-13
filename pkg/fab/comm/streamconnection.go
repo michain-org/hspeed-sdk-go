@@ -9,11 +9,11 @@ package comm
 import (
 	"sync"
 
-	credentials "github.com/hyperledger/fabric-sdk-go/gm/gmcredentials"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/options"
-	fabcontext "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	credentials "github.com/michain-org/hspeed-sdk-go/gm/gmcredentials"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/verifier"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/options"
+	fabcontext "github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"

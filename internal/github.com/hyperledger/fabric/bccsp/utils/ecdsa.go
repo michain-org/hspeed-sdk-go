@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 )
 
 type ECDSASignature struct {

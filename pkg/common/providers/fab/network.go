@@ -9,8 +9,8 @@ package fab
 import (
 	"time"
 
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/retry"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/retry"
 )
 
 // NetworkConfig provides a static definition of endpoint configuration network

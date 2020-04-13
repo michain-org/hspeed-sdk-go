@@ -16,10 +16,10 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
 )
 
 type aes256ImportKeyOptsKeyImporter struct{}

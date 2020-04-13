@@ -27,7 +27,7 @@ import (
 	"io"
 	"math/big"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm3"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm3"
 )
 
 var (

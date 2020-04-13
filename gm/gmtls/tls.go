@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
 )
 
 // Server returns a new TLS server side connection

@@ -11,7 +11,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/multi"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/multi"
 	"github.com/pkg/errors"
 	"github.com/spf13/cast"
 	"google.golang.org/grpc"
@@ -20,15 +20,15 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/common"
 	ab "github.com/hyperledger/fabric-protos-go/orderer"
-	"github.com/hyperledger/fabric-sdk-go/gm/gmcredentials"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/common/verifier"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/logging"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmcredentials"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/common/verifier"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/status"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/logging"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/comm"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/endpoint"
 )
 
 var logger = logging.NewLogger("fabsdk/fab")

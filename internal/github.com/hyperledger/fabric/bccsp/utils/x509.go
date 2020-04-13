@@ -21,7 +21,7 @@ Please review third_party pinning scripts and patches for more details.
 package utils
 
 import (
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
 )
 
 // DERToX509Certificate converts der to x509

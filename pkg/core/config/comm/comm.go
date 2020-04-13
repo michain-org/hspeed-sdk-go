@@ -7,10 +7,10 @@ SPDX-License-Identifier: Apache-2.0
 package comm
 
 import (
-	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/cryptosuite"
+	tls "github.com/michain-org/hspeed-sdk-go/gm/gmtls"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/cryptosuite"
 	"github.com/pkg/errors"
 )
 

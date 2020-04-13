@@ -21,7 +21,7 @@ import (
 	"hash"
 	"math/big"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 )
 
 // pkcs8 reflects an ASN.1, PKCS#8 PrivateKey. See

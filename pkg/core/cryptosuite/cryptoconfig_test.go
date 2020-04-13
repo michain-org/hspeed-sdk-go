@@ -14,10 +14,10 @@ import (
 
 	"strings"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/mocks"
-	"github.com/hyperledger/fabric-sdk-go/test/metadata"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/mocks"
+	"github.com/michain-org/hspeed-sdk-go/test/metadata"
 	"github.com/stretchr/testify/assert"
 )
 

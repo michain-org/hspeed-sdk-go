@@ -12,11 +12,11 @@ import (
 
 	"github.com/hyperledger/fabric-protos-go/discovery"
 	"github.com/hyperledger/fabric-protos-go/gossip"
-	discclient "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/discovery/client"
-	gprotoext "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/gossip/protoext"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
-	fabdiscovery "github.com/hyperledger/fabric-sdk-go/pkg/fab/discovery"
-	discmocks "github.com/hyperledger/fabric-sdk-go/pkg/fab/discovery/mocks"
+	discclient "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/discovery/client"
+	gprotoext "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/gossip/protoext"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	fabdiscovery "github.com/michain-org/hspeed-sdk-go/pkg/fab/discovery"
+	discmocks "github.com/michain-org/hspeed-sdk-go/pkg/fab/discovery/mocks"
 )
 
 // MockDiscoveryClient implements a mock Discover service

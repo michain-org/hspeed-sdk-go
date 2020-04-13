@@ -16,7 +16,7 @@ import (
 	"golang.org/x/crypto/chacha20poly1305"
 	"hash"
 
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
 )
 
 // a keyAgreement implements the client and server side of a TLS key agreement

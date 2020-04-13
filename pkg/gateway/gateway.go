@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/msp"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/context"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	mspProvider "github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fabsdk"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/msp"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	mspProvider "github.com/michain-org/hspeed-sdk-go/pkg/common/providers/msp"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fabsdk"
 	"github.com/pkg/errors"
 )
 

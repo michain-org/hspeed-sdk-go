@@ -18,8 +18,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	m "github.com/hyperledger/fabric-protos-go/msp"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	bccsp "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	bccsp "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
 	errors "github.com/pkg/errors"
 )
 

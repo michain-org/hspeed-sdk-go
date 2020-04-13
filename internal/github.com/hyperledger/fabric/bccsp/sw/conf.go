@@ -17,8 +17,8 @@ import (
 	"fmt"
 	"hash"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm3"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm3"
 
 	"golang.org/x/crypto/sha3"
 )

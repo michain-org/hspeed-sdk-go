@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	tls "github.com/michain-org/hspeed-sdk-go/gm/gmtls"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/pkg/errors"
 )
 

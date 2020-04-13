@@ -25,13 +25,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
-	"github.com/hyperledger/fabric-sdk-go/test/metadata"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp/utils"
+	"github.com/michain-org/hspeed-sdk-go/test/metadata"
 	"github.com/pkg/errors"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/comm/tls"
-	"github.com/hyperledger/fabric-sdk-go/pkg/fab/mocks"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/comm/tls"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/mocks"
 	mb "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/assert"
 )

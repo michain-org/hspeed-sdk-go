@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/client/channel/invoke"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/errors/status"
+	"github.com/michain-org/hspeed-sdk-go/pkg/client/channel/invoke"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/status"
 )
 
 func callQuery(cc *Client, request Request, options ...RequestOption) (Response, error) {

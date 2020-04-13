@@ -10,8 +10,8 @@ import (
 	"crypto/sha256"
 	"time"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/concurrent/lazycache"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/concurrent/lazyref"
+	"github.com/michain-org/hspeed-sdk-go/pkg/util/concurrent/lazycache"
+	"github.com/michain-org/hspeed-sdk-go/pkg/util/concurrent/lazyref"
 
 	"github.com/pkg/errors"
 )

@@ -26,18 +26,18 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 	"io/ioutil"
 	"strings"
 
-	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
+	tls "github.com/michain-org/hspeed-sdk-go/gm/gmtls"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
 
 	"github.com/cloudflare/cfssl/csr"
 	"github.com/cloudflare/cfssl/helpers"
-	factory "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/sdkpatch/cryptosuitebridge"
-	log "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric-ca/sdkpatch/logbridge"
+	factory "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric-ca/sdkpatch/cryptosuitebridge"
+	log "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric-ca/sdkpatch/logbridge"
 	"github.com/pkg/errors"
 )
 

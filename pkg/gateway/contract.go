@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 package gateway
 
-import "github.com/hyperledger/fabric-sdk-go/pkg/client/channel"
+import "github.com/michain-org/hspeed-sdk-go/pkg/client/channel"
 
 // A Contract object represents a smart contract instance in a network.
 // Applications should get a Contract instance from a Network using the GetContract method

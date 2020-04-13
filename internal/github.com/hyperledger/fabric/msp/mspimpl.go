@@ -18,9 +18,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	m "github.com/hyperledger/fabric-protos-go/msp"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
-	factory "github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
+	factory "github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/sdkpatch/cryptosuitebridge"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
 	"github.com/pkg/errors"
 )
 

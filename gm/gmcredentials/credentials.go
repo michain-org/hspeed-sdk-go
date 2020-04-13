@@ -31,8 +31,8 @@ import (
 	"net"
 	"strings"
 
-	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
+	tls "github.com/michain-org/hspeed-sdk-go/gm/gmtls"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
 
 	"github.com/golang/protobuf/proto"
 )

@@ -16,13 +16,13 @@ import (
 
 	"io/ioutil"
 
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/core"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/msp"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/endpoint"
-	"github.com/hyperledger/fabric-sdk-go/pkg/core/config/lookup"
-	logApi "github.com/hyperledger/fabric-sdk-go/pkg/core/logging/api"
-	fabImpl "github.com/hyperledger/fabric-sdk-go/pkg/fab"
-	"github.com/hyperledger/fabric-sdk-go/pkg/util/pathvar"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/core"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/msp"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/endpoint"
+	"github.com/michain-org/hspeed-sdk-go/pkg/core/config/lookup"
+	logApi "github.com/michain-org/hspeed-sdk-go/pkg/core/logging/api"
+	fabImpl "github.com/michain-org/hspeed-sdk-go/pkg/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/util/pathvar"
 )
 
 var defaultCAServerSchema = "https"

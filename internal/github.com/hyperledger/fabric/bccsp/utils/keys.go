@@ -19,8 +19,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
-	x509 "github.com/hyperledger/fabric-sdk-go/gm/gmx509"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
+	x509 "github.com/michain-org/hspeed-sdk-go/gm/gmx509"
 )
 
 // struct to hold info required for PKCS#8

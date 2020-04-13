@@ -42,8 +42,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm3"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm3"
 )
 
 // pkixPublicKey reflects a PKIX public key structure. See SubjectPublicKeyInfo

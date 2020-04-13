@@ -17,7 +17,7 @@ import (
 	"hash"
 	"io"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 )
 
 // pickSignatureAlgorithm selects a signature algorithm that is compatible with

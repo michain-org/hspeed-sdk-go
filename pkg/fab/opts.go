@@ -11,8 +11,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	tls "github.com/hyperledger/fabric-sdk-go/gm/gmtls"
-	"github.com/hyperledger/fabric-sdk-go/pkg/common/providers/fab"
+	tls "github.com/michain-org/hspeed-sdk-go/gm/gmtls"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 )
 
 // EndpointConfigOptions represents EndpointConfig interface with overridable interface functions

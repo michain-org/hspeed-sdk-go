@@ -3,8 +3,8 @@ package sw
 import (
 	"crypto/rand"
 
-	"github.com/hyperledger/fabric-sdk-go/gm/gmsm/sm2"
-	"github.com/hyperledger/fabric-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/bccsp"
 )
 
 func signSM2(k *sm2.PrivateKey, digest []byte, opts bccsp.SignerOpts) ([]byte, error) {
