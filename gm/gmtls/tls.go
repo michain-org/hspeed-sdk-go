@@ -24,7 +24,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"github.com/hyperledger/fabric/gm/gmsm/sm2"
+	"github.com/michain-org/hspeed-sdk-go/gm/gmsm/sm2"
 	"io/ioutil"
 	"net"
 	"strings"
