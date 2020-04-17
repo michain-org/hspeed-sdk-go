@@ -677,6 +677,7 @@ func createCSRInfo(csr *CSRInfo) *mspapi.CSRInfo {
 	return &mspapi.CSRInfo{
 		CN:    csr.CN,
 		Hosts: csr.Hosts,
+		Names: csr.Names,
 	}
 }
 
