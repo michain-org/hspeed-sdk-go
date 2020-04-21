@@ -1,6 +1,7 @@
 package resmgmt
 
 import (
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -9,6 +10,7 @@ import (
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/multi"
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/pkg/errors"
+	"reflect"
 	"sync"
 )
 
@@ -27,6 +29,7 @@ func (rc *Client) signProposal(proposal *pb.Proposal, signer protoutil.Signer) (
 		return nil, errors.Wrap(err, "error marshaling proposal")
 	}
 
+	fmt.Println(reflect.TypeOf(signer))
 	signature, err := signer.Sign(proposalBytes)
 	if err != nil {
 		return nil, err
@@ -72,7 +75,13 @@ func (rc *Client) LifecycleInstallChanincode(pkgBytes []byte, options ...Request
 		return errors.Wrap(err, "failed to serialize signer")
 	}
 	proposal, err := rc.createInstallProposal(pkgBytes, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create install proposal")
+	}
 	signedProposal, err := rc.signProposal(proposal, rc.ctx)
+	if err != nil {
+		return errors.WithMessage(err, "failed to sign proposal")
+	}
 	request := fab.ProcessProposalRequest{SignedProposal: signedProposal}
 	reqCtx, cancel := rc.createRequestContext(opts, fab.ResMgmt)
 	defer cancel()
