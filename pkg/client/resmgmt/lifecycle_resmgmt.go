@@ -1,27 +1,22 @@
 package resmgmt
 
 import (
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	lb "github.com/hyperledger/fabric-protos-go/peer/lifecycle"
 	"github.com/michain-org/hspeed-sdk-go/internal/github.com/hyperledger/fabric/protoutil"
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/multi"
+	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/pkg/errors"
-	"reflect"
 	"sync"
 )
 
-func (rc *Client) signProposal(proposal *pb.Proposal, signer protoutil.Signer) (*pb.SignedProposal, error) {
+func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.SignedProposal, error) {
 	// check for nil argument
 	if proposal == nil {
 		return nil, errors.New("proposal cannot be nil")
-	}
-
-	if signer == nil {
-		return nil, errors.New("signer cannot be nil")
 	}
 
 	proposalBytes, err := proto.Marshal(proposal)
@@ -29,8 +24,8 @@ func (rc *Client) signProposal(proposal *pb.Proposal, signer protoutil.Signer) (
 		return nil, errors.Wrap(err, "error marshaling proposal")
 	}
 
-	fmt.Println(reflect.TypeOf(signer))
-	signature, err := signer.Sign(proposalBytes)
+	signingMgr := ctx.SigningManager()
+	signature, err := signingMgr.Sign(proposalBytes, ctx.PrivateKey())
 	if err != nil {
 		return nil, err
 	}
