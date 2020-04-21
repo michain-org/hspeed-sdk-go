@@ -501,7 +501,7 @@ func (c *CAClientImpl) getRegistrar(enrollID string, enrollSecret string) (msp.S
 		}
 
 		// Attempt to enroll the registrar
-		err = c.Enroll(&api.EnrollmentRequest{Name: enrollID, Secret: enrollSecret})
+		err = c.Enroll(&api.EnrollmentRequest{Name: enrollID, Secret: enrollSecret, CAName: c.caName})
 		if err != nil {
 			return nil, err
 		}
