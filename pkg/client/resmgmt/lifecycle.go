@@ -19,7 +19,7 @@ const (
 	queryChaincodesFuncName         = "QueryChaincodeDefinitions"
 )
 
-func createPolicyBytes(signaturePolicy, channelConfigPolicy string) ([]byte, error) {
+func CreatePolicyBytes(signaturePolicy, channelConfigPolicy string) ([]byte, error) {
 	if signaturePolicy == "" && channelConfigPolicy == "" {
 		// no policy, no problem
 		return nil, nil
