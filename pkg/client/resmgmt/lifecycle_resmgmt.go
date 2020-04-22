@@ -59,6 +59,45 @@ func (rc *Client) createGetInstalledPackageProposal(packageID string, creator []
 	return rc.createProposal(ccInput, creator)
 }
 
+func (rc *Client) NewApproveForMyOrgProposalArgs(name string, v string, sequence int64, ep string, vp string, sp string, cp string,
+	packageID string, collectionsBytes []byte, initRequired bool) (*lb.ApproveChaincodeDefinitionForMyOrgArgs, error) {
+	policyBytes, err := createPolicyBytes(sp, cp)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create policy bytes")
+	}
+	collections, err := createCollectionConfigPackage(collectionsBytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create collections")
+	}
+	var ccsrc *lb.ChaincodeSource
+	if packageID != "" {
+		ccsrc = &lb.ChaincodeSource{
+			Type: &lb.ChaincodeSource_LocalPackage{
+				LocalPackage: &lb.ChaincodeSource_Local{
+					PackageId: packageID,
+				},
+			},
+		}
+	} else {
+		ccsrc = &lb.ChaincodeSource{
+			Type: &lb.ChaincodeSource_Unavailable_{
+				Unavailable: &lb.ChaincodeSource_Unavailable{},
+			},
+		}
+	}
+	return &lb.ApproveChaincodeDefinitionForMyOrgArgs{
+		Sequence:             sequence,
+		Name:                 name,
+		Version:              v,
+		EndorsementPlugin:    ep,
+		ValidationPlugin:     vp,
+		ValidationParameter:  policyBytes,
+		Collections:          collections,
+		InitRequired:         initRequired,
+		Source:               ccsrc,
+	}, nil
+}
+
 func (rc *Client) createApproveForMyOrgProposal(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, creator []byte) (*pb.Proposal, error) {
 	argsBytes, err := proto.Marshal(args)
 	if err != nil {
