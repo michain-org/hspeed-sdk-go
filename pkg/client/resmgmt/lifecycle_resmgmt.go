@@ -104,7 +104,7 @@ func (rc *Client) createQueryCommittedProposal(name string, creator []byte) (*pb
 	return rc.createProposal(ccInput, creator)
 }
 
-func (rc *Client) LifecycleInstallChaincode(pkgBytes []byte, options ...RequestOption) error {
+func (rc *Client) LifecycleInstall(pkgBytes []byte, options ...RequestOption) error {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
@@ -116,7 +116,7 @@ func (rc *Client) LifecycleInstallChaincode(pkgBytes []byte, options ...RequestO
 	return rc.SignAndSendProposal(proposal, options)
 }
 
-func (rc *Client) LifecycleQueryChaincodeInstalled(options ...RequestOption) error {
+func (rc *Client) LifecycleQueryInstalled(options ...RequestOption) error {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
