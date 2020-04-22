@@ -338,7 +338,7 @@ func (c *Client) Enroll(enrollmentID string, opts ...EnrollmentOption) error {
 	req := &mspapi.EnrollmentRequest{
 		Name:    enrollmentID,
 		Secret:  eo.secret,
-		CAName:  c.caName,
+		CAName:  eo.caName,
 		Profile: eo.profile,
 		Type:    eo.typ,
 		Label:   eo.label,
