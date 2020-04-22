@@ -1,6 +1,7 @@
 package resmgmt
 
 import (
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -156,14 +157,14 @@ func (rc *Client) LifecycleInstall(pkgBytes []byte, channelID string, options ..
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign and send proposal")
 	}
-	icr := &lb.InstallChaincodeResult{}
+	response := &lb.InstallChaincodeResult{}
 	if len(proposalResponse) > 0 {
-		err = proto.Unmarshal(proposalResponse[0].Response.Payload, icr)
+		err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to unmarshal to InstallChaincodeResult")
 		}
 	}
-	return icr, err
+	return response, err
 }
 
 func (rc *Client) LifecycleQueryInstalled(channelID string, options ...RequestOption) error {
@@ -192,17 +193,26 @@ func (rc *Client) LifecycleGetInstalledPackage(packageId string, channelID strin
 	return err
 }
 
-func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, channelID string, options ...RequestOption) error {
+func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, channelID string, options ...RequestOption) (*lb.ApproveChaincodeDefinitionForMyOrgResult, error) {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
-		return errors.Wrap(err, "failed to serialize signer")
+		return nil, errors.Wrap(err, "failed to serialize signer")
 	}
 	proposal, err := rc.createApproveForMyOrgProposal(args, channelID, serializedSigner)
 	if err != nil {
-		return errors.WithMessage(err, "failed to create approve proposal")
+		return nil, errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.SignAndSendProposal(proposal, options)
-	return err
+	proposalResponse, err := rc.SignAndSendProposal(proposal, options)
+
+	response := &lb.ApproveChaincodeDefinitionForMyOrgResult{}
+	if len(proposalResponse) > 0 {
+		fmt.Println(proposalResponse[0].Response.Message)
+		err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal to InstallChaincodeResult")
+		}
+	}
+	return response, err
 }
 
 func (rc *Client) LifecycleCheckCommitReadiness(args *lb.CheckCommitReadinessArgs, channelID string, options ...RequestOption) error {
