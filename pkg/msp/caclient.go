@@ -492,7 +492,7 @@ func (c *CAClientImpl) getRegistrar(enrollID string, enrollSecret string, caName
 		return nil, api.ErrCARegistrarNotFound
 	}
 
-	registrar, err := c.identityManager.GetSigningIdentity(enrollID)
+	registrar, err := c.identityManager.GetCASigningIdentity(caName, enrollID)
 	if err != nil {
 		if err != msp.ErrUserNotFound {
 			return nil, err
@@ -506,10 +506,15 @@ func (c *CAClientImpl) getRegistrar(enrollID string, enrollSecret string, caName
 		if err != nil {
 			return nil, err
 		}
-		registrar, err = c.identityManager.GetSigningIdentity(enrollID)
+		//registrar, err = c.identityManager.GetSigningIdentity(enrollID)
+		//if err != nil {
+		//	return nil, err
+		//}
+		registrar, err = c.identityManager.GetCASigningIdentity(caName, enrollID)
 		if err != nil {
 			return nil, err
 		}
+
 	}
 	return registrar, nil
 }

@@ -83,6 +83,8 @@ type EnrollmentRequest struct {
 	Type string
 	// CSR is Certificate Signing Request info
 	CSR *CSRInfo
+	// ORG name
+	ORG string
 }
 
 // CSRInfo is Certificate Signing Request (CSR) Information

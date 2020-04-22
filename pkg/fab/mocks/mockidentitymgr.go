@@ -85,3 +85,12 @@ func (mgr *MockIdentityManager) GetSigningIdentity(id string) (msp.SigningIdenti
 func (mgr *MockIdentityManager) CreateSigningIdentity(opts ...msp.SigningIdentityOption) (msp.SigningIdentity, error) {
 	return nil, errors.New("not implemented")
 }
+
+// GetSigningIdentity will return an identity that can be used to cryptographically sign an object
+func (mgr *MockIdentityManager) GetCASigningIdentity(name, id string) (msp.SigningIdentity, error) {
+	si, ok := mgr.users[id]
+	if !ok {
+		return nil, msp.ErrUserNotFound
+	}
+	return si, nil
+}
