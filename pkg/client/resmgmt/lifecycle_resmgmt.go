@@ -13,6 +13,66 @@ import (
 	"sync"
 )
 
+func (rc *Client) createProposal(input *pb.ChaincodeInput, creator []byte) (*pb.Proposal, error) {
+	cis := &pb.ChaincodeInvocationSpec{
+		ChaincodeSpec: &pb.ChaincodeSpec{
+			ChaincodeId: &pb.ChaincodeID{ Name: lifecycleName },
+			Input:       input,
+		},
+	}
+	proposal, _, err := protoutil.CreateProposalFromCIS(cb.HeaderType_ENDORSER_TRANSACTION, "", cis, creator)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to create proposal for ChaincodeInvocationSpec")
+	}
+	return proposal, nil
+}
+
+func (rc *Client) createInstallProposal(pkgBytes []byte, creator []byte) (*pb.Proposal, error) {
+	args := &lb.InstallChaincodeArgs{
+		ChaincodeInstallPackage: pkgBytes,
+	}
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte("InstallChaincode"), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) createQueryInstalledProposal(creator []byte) (*pb.Proposal, error) {
+	args := &lb.QueryInstalledChaincodeArgs{}
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte("QueryInstalledChaincodes"), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) LifecycleInstall(pkgBytes []byte, options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createInstallProposal(pkgBytes, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create install proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
+func (rc *Client) LifecycleQueryInstalled(options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createQueryInstalledProposal(serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create install proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
 func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.SignedProposal, error) {
 	// check for nil argument
 	if proposal == nil {
@@ -36,43 +96,12 @@ func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.S
 	}, nil
 }
 
-func (rc *Client) createInstallProposal(pkgBytes []byte, creatorBytes []byte) (*pb.Proposal, error) {
-	installChaincodeArgs := &lb.InstallChaincodeArgs{
-		ChaincodeInstallPackage: pkgBytes,
-	}
-	installChaincodeArgsBytes, err := proto.Marshal(installChaincodeArgs)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to marshal InstallChaincodeArgs")
-	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte("InstallChaincode"), installChaincodeArgsBytes}}
-	cis := &pb.ChaincodeInvocationSpec{
-		ChaincodeSpec: &pb.ChaincodeSpec{
-			ChaincodeId: &pb.ChaincodeID{ Name: lifecycleName },
-			Input:       ccInput,
-		},
-	}
-	proposal, _, err := protoutil.CreateProposalFromCIS(cb.HeaderType_ENDORSER_TRANSACTION, "", cis, creatorBytes)
-	if err != nil {
-		return nil, errors.WithMessage(err, "failed to create proposal for ChaincodeInvocationSpec")
-	}
-	return proposal, nil
-}
-
-func (rc *Client) LifecycleInstallChanincode(pkgBytes []byte, options ...RequestOption) error {
+func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOption) error {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
 		return errors.WithMessage(err, "failed to get opts for InstantiateCC")
 	}
 	targets := opts.Targets
-
-	serializedSigner, err := rc.ctx.Serialize()
-	if err != nil {
-		return errors.Wrap(err, "failed to serialize signer")
-	}
-	proposal, err := rc.createInstallProposal(pkgBytes, serializedSigner)
-	if err != nil {
-		return errors.WithMessage(err, "failed to create install proposal")
-	}
 	signedProposal, err := rc.signProposal(proposal, rc.ctx)
 	if err != nil {
 		return errors.WithMessage(err, "failed to sign proposal")
