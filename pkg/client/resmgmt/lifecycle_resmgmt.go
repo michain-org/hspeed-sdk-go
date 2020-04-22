@@ -35,7 +35,7 @@ func (rc *Client) createInstallProposal(pkgBytes []byte, creator []byte) (*pb.Pr
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte("InstallChaincode"), argsBytes}}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(installFuncName), argsBytes}}
 	return rc.createProposal(ccInput, creator)
 }
 
@@ -45,11 +45,66 @@ func (rc *Client) createQueryInstalledProposal(creator []byte) (*pb.Proposal, er
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte("QueryInstalledChaincodes"), argsBytes}}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(queryInstalledFuncName), argsBytes}}
 	return rc.createProposal(ccInput, creator)
 }
 
-func (rc *Client) LifecycleInstall(pkgBytes []byte, options ...RequestOption) error {
+func (rc *Client) createGetInstalledPackageProposal(packageID string, creator []byte) (*pb.Proposal, error) {
+	args := &lb.GetInstalledChaincodePackageArgs{ PackageId: packageID }
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(getInstalledPackageFuncName), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) createApproveForMyOrgProposal(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, creator []byte) (*pb.Proposal, error) {
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(approveFuncName), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) createCheckCommitReadinessProposal(args *lb.CheckCommitReadinessArgs, creator []byte) (*pb.Proposal, error) {
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(checkCommitReadinessFuncName), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) createCommitProposal(args *lb.CommitChaincodeDefinitionArgs, creator []byte) (*pb.Proposal, error) {
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(commitFuncName), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) createQueryCommittedProposal(name string, creator []byte) (*pb.Proposal, error) {
+	var function string
+	var args proto.Message
+	if name == "" {
+		function = queryChaincodesFuncName
+		args = &lb.QueryChaincodeDefinitionsArgs{}
+	} else {
+		function = queryChaincodeFuncName
+		args = &lb.QueryChaincodeDefinitionArgs{ Name: name }
+	}
+	argsBytes, err := proto.Marshal(args)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal args")
+	}
+	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(function), argsBytes}}
+	return rc.createProposal(ccInput, creator)
+}
+
+func (rc *Client) LifecycleInstallChaincode(pkgBytes []byte, options ...RequestOption) error {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
@@ -61,14 +116,74 @@ func (rc *Client) LifecycleInstall(pkgBytes []byte, options ...RequestOption) er
 	return rc.SignAndSendProposal(proposal, options)
 }
 
-func (rc *Client) LifecycleQueryInstalled(options ...RequestOption) error {
+func (rc *Client) LifecycleQueryChaincodeInstalled(options ...RequestOption) error {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
 	}
 	proposal, err := rc.createQueryInstalledProposal(serializedSigner)
 	if err != nil {
-		return errors.WithMessage(err, "failed to create install proposal")
+		return errors.WithMessage(err, "failed to create query installed proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
+func (rc *Client) LifecycleGetInstalledPackage(packageId string, options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createGetInstalledPackageProposal(packageId, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create query installed proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
+func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createApproveForMyOrgProposal(args, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create approve proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
+func (rc *Client) LifecycleCheckCommitReadiness(args *lb.CheckCommitReadinessArgs, options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createCheckCommitReadinessProposal(args, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create approve proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
+func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createCommitProposal(args, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create approve proposal")
+	}
+	return rc.SignAndSendProposal(proposal, options)
+}
+
+func (rc *Client) LifecycleQueryCommitted(name string, options ...RequestOption) error {
+	serializedSigner, err := rc.ctx.Serialize()
+	if err != nil {
+		return errors.Wrap(err, "failed to serialize signer")
+	}
+	proposal, err := rc.createQueryCommittedProposal(name, serializedSigner)
+	if err != nil {
+		return errors.WithMessage(err, "failed to create approve proposal")
 	}
 	return rc.SignAndSendProposal(proposal, options)
 }
