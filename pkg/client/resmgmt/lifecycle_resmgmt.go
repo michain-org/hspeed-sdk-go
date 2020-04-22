@@ -143,16 +143,27 @@ func (rc *Client) createQueryCommittedProposal(name string, creator []byte) (*pb
 	return rc.createProposal(ccInput, creator)
 }
 
-func (rc *Client) LifecycleInstall(pkgBytes []byte, options ...RequestOption) error {
+func (rc *Client) LifecycleInstall(pkgBytes []byte, options ...RequestOption) (*lb.InstallChaincodeResult, error) {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
-		return errors.Wrap(err, "failed to serialize signer")
+		return nil, errors.Wrap(err, "failed to serialize signer")
 	}
 	proposal, err := rc.createInstallProposal(pkgBytes, serializedSigner)
 	if err != nil {
-		return errors.WithMessage(err, "failed to create install proposal")
+		return nil, errors.Wrap(err, "failed to create install proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	proposalResponse, err := rc.SignAndSendProposal(proposal, options)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to sign and send proposal")
+	}
+	icr := &lb.InstallChaincodeResult{}
+	if len(proposalResponse) > 0 {
+		err = proto.Unmarshal(proposalResponse[0].Response.Payload, icr)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal to InstallChaincodeResult")
+		}
+	}
+	return icr, err
 }
 
 func (rc *Client) LifecycleQueryInstalled(options ...RequestOption) error {
@@ -164,7 +175,8 @@ func (rc *Client) LifecycleQueryInstalled(options ...RequestOption) error {
 	if err != nil {
 		return errors.WithMessage(err, "failed to create query installed proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	_, err = rc.SignAndSendProposal(proposal, options)
+	return err
 }
 
 func (rc *Client) LifecycleGetInstalledPackage(packageId string, options ...RequestOption) error {
@@ -176,7 +188,8 @@ func (rc *Client) LifecycleGetInstalledPackage(packageId string, options ...Requ
 	if err != nil {
 		return errors.WithMessage(err, "failed to create query installed proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	_, err = rc.SignAndSendProposal(proposal, options)
+	return err
 }
 
 func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, options ...RequestOption) error {
@@ -188,7 +201,8 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	_, err = rc.SignAndSendProposal(proposal, options)
+	return err
 }
 
 func (rc *Client) LifecycleCheckCommitReadiness(args *lb.CheckCommitReadinessArgs, options ...RequestOption) error {
@@ -200,7 +214,8 @@ func (rc *Client) LifecycleCheckCommitReadiness(args *lb.CheckCommitReadinessArg
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	_, err = rc.SignAndSendProposal(proposal, options)
+	return err
 }
 
 func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, options ...RequestOption) error {
@@ -212,7 +227,8 @@ func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, option
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	_, err = rc.SignAndSendProposal(proposal, options)
+	return err
 }
 
 func (rc *Client) LifecycleQueryCommitted(name string, options ...RequestOption) error {
@@ -224,7 +240,8 @@ func (rc *Client) LifecycleQueryCommitted(name string, options ...RequestOption)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	return rc.SignAndSendProposal(proposal, options)
+	_, err = rc.SignAndSendProposal(proposal, options)
+	return err
 }
 
 func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.SignedProposal, error) {
@@ -250,15 +267,15 @@ func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.S
 	}, nil
 }
 
-func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOption) error {
+func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
-		return errors.WithMessage(err, "failed to get opts for InstantiateCC")
+		return nil, errors.WithMessage(err, "failed to get opts for InstantiateCC")
 	}
 	targets := opts.Targets
 	signedProposal, err := rc.signProposal(proposal, rc.ctx)
 	if err != nil {
-		return errors.WithMessage(err, "failed to sign proposal")
+		return nil, errors.WithMessage(err, "failed to sign proposal")
 	}
 	request := fab.ProcessProposalRequest{SignedProposal: signedProposal}
 	reqCtx, cancel := rc.createRequestContext(opts, fab.ResMgmt)
@@ -289,8 +306,6 @@ func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOp
 		}(p)
 	}
 	wg.Wait()
-	if err != nil {
-		return errors.WithMessage(err, "failed to create signed proposal for chaincode install")
-	}
-	return nil
+
+	return transactionProposalResponses, errs.ToError()
 }
