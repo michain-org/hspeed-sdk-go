@@ -141,7 +141,7 @@ func (c *CAClientImpl) Enroll(request *api.EnrollmentRequest) error {
 		return errors.Wrap(err, "enroll failed")
 	}
 	userData := &msp.UserData{
-		MSPID:                 c.orgMSPID,
+		MSPID:                 request.CAName,
 		ID:                    request.Name,
 		EnrollmentCertificate: cert,
 	}
