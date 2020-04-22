@@ -17,7 +17,7 @@ import (
 func (rc *Client) createProposal(input *pb.ChaincodeInput, channelID string, creator []byte) (*pb.Proposal, error) {
 	cis := &pb.ChaincodeInvocationSpec{
 		ChaincodeSpec: &pb.ChaincodeSpec{
-			ChaincodeId: &pb.ChaincodeID{ Name: lifecycleName },
+			ChaincodeId: &pb.ChaincodeID{Name: lifecycleName},
 			Input:       input,
 		},
 	}
@@ -36,7 +36,7 @@ func (rc *Client) createInstallProposal(pkgBytes []byte, channelID string, creat
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(installFuncName), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(installFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
@@ -46,17 +46,17 @@ func (rc *Client) createQueryInstalledProposal(channelID string, creator []byte)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(queryInstalledFuncName), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(queryInstalledFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
 func (rc *Client) createGetInstalledPackageProposal(packageID string, channelID string, creator []byte) (*pb.Proposal, error) {
-	args := &lb.GetInstalledChaincodePackageArgs{ PackageId: packageID }
+	args := &lb.GetInstalledChaincodePackageArgs{PackageId: packageID}
 	argsBytes, err := proto.Marshal(args)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(getInstalledPackageFuncName), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(getInstalledPackageFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
@@ -87,15 +87,15 @@ func (rc *Client) NewApproveForMyOrgProposalArgs(name string, v string, sequence
 		}
 	}
 	return &lb.ApproveChaincodeDefinitionForMyOrgArgs{
-		Sequence:             sequence,
-		Name:                 name,
-		Version:              v,
-		EndorsementPlugin:    ep,
-		ValidationPlugin:     vp,
-		ValidationParameter:  policyBytes,
-		Collections:          collections,
-		InitRequired:         initRequired,
-		Source:               ccsrc,
+		Sequence:            sequence,
+		Name:                name,
+		Version:             v,
+		EndorsementPlugin:   ep,
+		ValidationPlugin:    vp,
+		ValidationParameter: policyBytes,
+		Collections:         collections,
+		InitRequired:        initRequired,
+		Source:              ccsrc,
 	}, nil
 }
 
@@ -104,7 +104,7 @@ func (rc *Client) createApproveForMyOrgProposal(args *lb.ApproveChaincodeDefinit
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(approveFuncName), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(approveFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
@@ -113,7 +113,7 @@ func (rc *Client) createCheckCommitReadinessProposal(args *lb.CheckCommitReadine
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(checkCommitReadinessFuncName), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(checkCommitReadinessFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
@@ -122,7 +122,7 @@ func (rc *Client) createCommitProposal(args *lb.CommitChaincodeDefinitionArgs, c
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(commitFuncName), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(commitFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
@@ -134,13 +134,13 @@ func (rc *Client) createQueryCommittedProposal(name string, channelID string, cr
 		args = &lb.QueryChaincodeDefinitionsArgs{}
 	} else {
 		function = queryChaincodeFuncName
-		args = &lb.QueryChaincodeDefinitionArgs{ Name: name }
+		args = &lb.QueryChaincodeDefinitionArgs{Name: name}
 	}
 	argsBytes, err := proto.Marshal(args)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
-	ccInput := &pb.ChaincodeInput{ Args: [][]byte{[]byte(function), argsBytes}}
+	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(function), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
 
@@ -206,7 +206,7 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 
 	response := &lb.ApproveChaincodeDefinitionForMyOrgResult{}
 	if len(proposalResponse) > 0 {
-		fmt.Println(proposalResponse[0].Response.Message)
+		fmt.Println(proposalResponse[0].Response)
 		err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to unmarshal to InstallChaincodeResult")
