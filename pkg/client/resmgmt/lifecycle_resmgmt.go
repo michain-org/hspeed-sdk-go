@@ -1,7 +1,6 @@
 package resmgmt
 
 import (
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -206,7 +205,6 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 
 	response := &lb.ApproveChaincodeDefinitionForMyOrgResult{}
 	if len(proposalResponse) > 0 {
-		fmt.Println(proposalResponse[0].Response)
 		err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to unmarshal to InstallChaincodeResult")
