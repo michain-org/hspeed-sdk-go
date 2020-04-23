@@ -303,6 +303,10 @@ func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channe
 
 	response := &lb.CommitChaincodeDefinitionResult{}
 	proposalResponses, err := rc.ProcessTransactionProposal(proposal, options)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to send commit proposal")
+	}
+
 	if len(proposalResponses) == 0 {
 		return nil, errors.New("chaincode commit failed: received proposal response with nil response")
 
@@ -362,7 +366,7 @@ func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.S
 func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
-		return nil, errors.WithMessage(err, "failed to get opts for InstantiateCC")
+		return nil, errors.WithMessage(err, "failed to get opts")
 	}
 	targets := opts.Targets
 
