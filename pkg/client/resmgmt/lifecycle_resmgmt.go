@@ -105,6 +105,30 @@ func (rc *Client) NewApproveForMyOrgProposalArgs(name string, v string, sequence
 	}, nil
 }
 
+func (rc *Client) NewCommitChaincodeDefinitionArgs(name string, v string, sequence int64, ep string, vp string, sp string, cp string,
+	collectionsBytes []byte, initRequired bool) (*lb.CommitChaincodeDefinitionArgs, error) {
+	policyBytes, err := createPolicyBytes(sp, cp)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create policy bytes")
+	}
+
+	collections, err := createCollectionConfigPackage(collectionsBytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create collections")
+	}
+
+	return &lb.CommitChaincodeDefinitionArgs{
+		Sequence:            sequence,
+		Name:                name,
+		Version:             v,
+		EndorsementPlugin:   ep,
+		ValidationPlugin:    vp,
+		ValidationParameter: policyBytes,
+		Collections:         collections,
+		InitRequired:        initRequired,
+	}, nil
+}
+
 func (rc *Client) createApproveForMyOrgProposal(args *lb.ApproveChaincodeDefinitionForMyOrgArgs, channelID string, creator []byte) (*pb.Proposal, error) {
 	argsBytes, err := proto.Marshal(args)
 	if err != nil {
@@ -165,20 +189,20 @@ func (rc *Client) LifecycleInstall(pkgBytes []byte, channelID string, options ..
 		return nil, errors.Wrap(err, "failed to create install proposal")
 	}
 
-	proposalResponse, err := rc.ProcessTransactionProposal(proposal, channelID, options)
+	proposalResponses, err := rc.ProcessTransactionProposal(proposal, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign and send proposal")
 	}
 
 	response := &lb.InstallChaincodeResult{}
-	if len(proposalResponse) == 0 {
+	if len(proposalResponses) == 0 {
 		return nil, errors.New("chaincode install failed: received proposal response with nil response")
 
 	}
-	if proposalResponse[0].Status != int32(cb.Status_SUCCESS) {
-		return nil, errors.Errorf("chaincode install failed with status %d - %s", proposalResponse[0].Response.Status, proposalResponse[0].Response.Message)
+	if proposalResponses[0].Status != int32(cb.Status_SUCCESS) {
+		return nil, errors.Errorf("chaincode install failed with status %d - %s", proposalResponses[0].Response.Status, proposalResponses[0].Response.Message)
 	}
-	err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
+	err = proto.Unmarshal(proposalResponses[0].Response.Payload, response)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal to InstallChaincodeResult")
 	}
@@ -196,7 +220,7 @@ func (rc *Client) LifecycleQueryInstalled(channelID string, options ...RequestOp
 		return errors.WithMessage(err, "failed to create query installed proposal")
 	}
 
-	_, err = rc.ProcessTransactionProposal(proposal, channelID, options)
+	_, err = rc.ProcessTransactionProposal(proposal, options)
 	return err
 }
 
@@ -211,7 +235,7 @@ func (rc *Client) LifecycleGetInstalledPackage(packageId string, channelID strin
 		return errors.WithMessage(err, "failed to create query installed proposal")
 	}
 
-	_, err = rc.ProcessTransactionProposal(proposal, channelID, options)
+	_, err = rc.ProcessTransactionProposal(proposal, options)
 	return err
 }
 
@@ -226,25 +250,25 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 		return nil, errors.WithMessage(err, "failed to create approve proposal")
 	}
 
-	proposalResponse, err := rc.ProcessTransactionProposal(proposal, channelID, options)
+	proposalResponses, err := rc.ProcessTransactionProposal(proposal, options)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to send approve proposal")
 	}
 
 	response := &lb.ApproveChaincodeDefinitionForMyOrgResult{}
-	if len(proposalResponse) == 0 {
+	if len(proposalResponses) == 0 {
 		return nil, errors.New("chaincode approve failed: received proposal response with nil response")
 
 	}
-	if proposalResponse[0].Status != int32(cb.Status_SUCCESS) {
-		return nil, errors.Errorf("chaincode approve failed with status %d - %s", proposalResponse[0].Response.Status, proposalResponse[0].Response.Message)
+	if proposalResponses[0].Status != int32(cb.Status_SUCCESS) {
+		return nil, errors.Errorf("chaincode approve failed with status %d - %s", proposalResponses[0].Response.Status, proposalResponses[0].Response.Message)
 	}
-	err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
+	err = proto.Unmarshal(proposalResponses[0].Response.Payload, response)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal to ApproveChaincodeDefinitionForMyOrgResult")
 	}
 
-	err = rc.submitProposal(proposal, channelID, options, proposalResponse)
+	err = rc.submitProposal(proposal, channelID, options, proposalResponses)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
@@ -262,22 +286,40 @@ func (rc *Client) LifecycleCheckCommitReadiness(args *lb.CheckCommitReadinessArg
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.ProcessTransactionProposal(proposal, channelID, options)
+	_, err = rc.ProcessTransactionProposal(proposal, options)
 	return err
 }
 
-func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channelID string, options ...RequestOption) error {
+func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channelID string, options ...RequestOption) (*lb.CommitChaincodeDefinitionResult, error) {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
-		return errors.Wrap(err, "failed to serialize signer")
+		return nil, errors.Wrap(err, "failed to serialize signer")
 	}
 
 	proposal, err := rc.createCommitProposal(args, channelID, serializedSigner)
 	if err != nil {
-		return errors.WithMessage(err, "failed to create approve proposal")
+		return nil, errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.ProcessTransactionProposal(proposal, channelID, options)
-	return err
+
+	response := &lb.CommitChaincodeDefinitionResult{}
+	proposalResponses, err := rc.ProcessTransactionProposal(proposal, options)
+	if len(proposalResponses) == 0 {
+		return nil, errors.New("chaincode commit failed: received proposal response with nil response")
+
+	}
+	if proposalResponses[0].Status != int32(cb.Status_SUCCESS) {
+		return nil, errors.Errorf("chaincode commit failed with status %d - %s", proposalResponses[0].Response.Status, proposalResponses[0].Response.Message)
+	}
+	err = proto.Unmarshal(proposalResponses[0].Response.Payload, response)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal to CommitChaincodeDefinitionResult")
+	}
+
+	err = rc.submitProposal(proposal, channelID, options, proposalResponses)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed when submit proposal")
+	}
+	return response, err
 }
 
 func (rc *Client) LifecycleQueryCommitted(name string, channelID string, options ...RequestOption) error {
@@ -290,7 +332,7 @@ func (rc *Client) LifecycleQueryCommitted(name string, channelID string, options
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.ProcessTransactionProposal(proposal, channelID, options)
+	_, err = rc.ProcessTransactionProposal(proposal, options)
 	return err
 }
 
@@ -317,7 +359,7 @@ func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.S
 	}, nil
 }
 
-func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, channelID string, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
+func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to get opts for InstantiateCC")
@@ -341,8 +383,6 @@ func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, channelID st
 		wg.Add(1)
 		go func(processor fab.ProposalProcessor) {
 			defer wg.Done()
-
-			// TODO: The RPC should be timed-out.
 
 			resp, err := p.ProcessTransactionProposal(reqCtx, request)
 			if err != nil {
