@@ -1,6 +1,7 @@
 package resmgmt
 
 import (
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -9,6 +10,7 @@ import (
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/errors/multi"
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/context"
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
+	"github.com/michain-org/hspeed-sdk-go/pkg/fab/txn"
 	"github.com/pkg/errors"
 	"sync"
 )
@@ -24,6 +26,7 @@ func (rc *Client) createProposal(input *pb.ChaincodeInput, channelID string, cre
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to create proposal for ChaincodeInvocationSpec")
 	}
+
 	return proposal, nil
 }
 
@@ -35,6 +38,7 @@ func (rc *Client) createInstallProposal(pkgBytes []byte, channelID string, creat
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(installFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -45,6 +49,7 @@ func (rc *Client) createQueryInstalledProposal(channelID string, creator []byte)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(queryInstalledFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -55,6 +60,7 @@ func (rc *Client) createGetInstalledPackageProposal(packageID string, channelID 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(getInstalledPackageFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -65,10 +71,12 @@ func (rc *Client) NewApproveForMyOrgProposalArgs(name string, v string, sequence
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create policy bytes")
 	}
+
 	collections, err := createCollectionConfigPackage(collectionsBytes)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create collections")
 	}
+
 	var ccsrc *lb.ChaincodeSource
 	if packageID != "" {
 		ccsrc = &lb.ChaincodeSource{
@@ -103,6 +111,7 @@ func (rc *Client) createApproveForMyOrgProposal(args *lb.ApproveChaincodeDefinit
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(approveFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -112,6 +121,7 @@ func (rc *Client) createCheckCommitReadinessProposal(args *lb.CheckCommitReadine
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(checkCommitReadinessFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -121,6 +131,7 @@ func (rc *Client) createCommitProposal(args *lb.CommitChaincodeDefinitionArgs, c
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(commitFuncName), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -139,6 +150,7 @@ func (rc *Client) createQueryCommittedProposal(name string, channelID string, cr
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal args")
 	}
+
 	ccInput := &pb.ChaincodeInput{Args: [][]byte{[]byte(function), argsBytes}}
 	return rc.createProposal(ccInput, channelID, creator)
 }
@@ -148,14 +160,17 @@ func (rc *Client) LifecycleInstall(pkgBytes []byte, channelID string, options ..
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createInstallProposal(pkgBytes, channelID, serializedSigner)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create install proposal")
 	}
-	proposalResponse, err := rc.SignAndSendProposal(proposal, options)
+
+	proposalResponse, err := rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to sign and send proposal")
 	}
+
 	response := &lb.InstallChaincodeResult{}
 	if len(proposalResponse) > 0 {
 		err = proto.Unmarshal(proposalResponse[0].Response.Payload, response)
@@ -171,11 +186,13 @@ func (rc *Client) LifecycleQueryInstalled(channelID string, options ...RequestOp
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createQueryInstalledProposal(channelID, serializedSigner)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create query installed proposal")
 	}
-	_, err = rc.SignAndSendProposal(proposal, options)
+
+	_, err = rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
 	return err
 }
 
@@ -184,11 +201,13 @@ func (rc *Client) LifecycleGetInstalledPackage(packageId string, channelID strin
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createGetInstalledPackageProposal(packageId, channelID, serializedSigner)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create query installed proposal")
 	}
-	_, err = rc.SignAndSendProposal(proposal, options)
+
+	_, err = rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
 	return err
 }
 
@@ -197,11 +216,16 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createApproveForMyOrgProposal(args, channelID, serializedSigner)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to create approve proposal")
 	}
-	proposalResponse, err := rc.SignAndSendProposal(proposal, options)
+
+	proposalResponse, err := rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to send approve proposal")
+	}
 
 	response := &lb.ApproveChaincodeDefinitionForMyOrgResult{}
 	if len(proposalResponse) > 0 {
@@ -218,11 +242,12 @@ func (rc *Client) LifecycleCheckCommitReadiness(args *lb.CheckCommitReadinessArg
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createCheckCommitReadinessProposal(args, channelID, serializedSigner)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.SignAndSendProposal(proposal, options)
+	_, err = rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
 	return err
 }
 
@@ -231,11 +256,12 @@ func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channe
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createCommitProposal(args, channelID, serializedSigner)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.SignAndSendProposal(proposal, options)
+	_, err = rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
 	return err
 }
 
@@ -244,11 +270,12 @@ func (rc *Client) LifecycleQueryCommitted(name string, channelID string, options
 	if err != nil {
 		return errors.Wrap(err, "failed to serialize signer")
 	}
+
 	proposal, err := rc.createQueryCommittedProposal(name, channelID, serializedSigner)
 	if err != nil {
 		return errors.WithMessage(err, "failed to create approve proposal")
 	}
-	_, err = rc.SignAndSendProposal(proposal, options)
+	_, err = rc.ProcessTransactionProposalAndSend(proposal, channelID, options)
 	return err
 }
 
@@ -275,19 +302,22 @@ func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.S
 	}, nil
 }
 
-func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
+func (rc *Client) ProcessTransactionProposalAndSend(proposal *pb.Proposal, channelID string, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to get opts for InstantiateCC")
 	}
 	targets := opts.Targets
+
 	signedProposal, err := rc.signProposal(proposal, rc.ctx)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to sign proposal")
 	}
+
 	request := fab.ProcessProposalRequest{SignedProposal: signedProposal}
 	reqCtx, cancel := rc.createRequestContext(opts, fab.ResMgmt)
 	defer cancel()
+
 	var responseMtx sync.Mutex
 	var transactionProposalResponses []*fab.TransactionProposalResponse
 	var wg sync.WaitGroup
@@ -298,8 +328,8 @@ func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOp
 			defer wg.Done()
 
 			// TODO: The RPC should be timed-out.
-			//resp, err := processor.ProcessTransactionProposal(context.NewRequestOLD(ctx), request)
-			resp, err := processor.ProcessTransactionProposal(reqCtx, request)
+
+			resp, err := p.ProcessTransactionProposal(reqCtx, request)
 			if err != nil {
 				logger.Debugf("Received error response from txn proposal processing: %s", err)
 				responseMtx.Lock()
@@ -315,5 +345,40 @@ func (rc *Client) SignAndSendProposal(proposal *pb.Proposal, options []RequestOp
 	}
 	wg.Wait()
 
+	txID, err := txn.NewHeader(rc.ctx, channelID)
+	if err != nil {
+		return nil, errors.WithMessage(err, "create transaction ID failed")
+	}
+
+	txProposal := &fab.TransactionProposal{
+		TxnID:    txID.TransactionID(),
+		Proposal: proposal,
+	}
+
+	txnRequest := fab.TransactionRequest{
+		Proposal:          txProposal,
+		ProposalResponses: transactionProposalResponses,
+	}
+
+	channelService, err := rc.ctx.ChannelProvider().ChannelService(rc.ctx, channelID)
+	if err != nil {
+		return nil, errors.WithMessage(err, "Unable to get channel service")
+	}
+
+	transactor, err := channelService.Transactor(reqCtx)
+	if err != nil {
+		return nil, errors.WithMessage(err, "get channel transactor failed")
+	}
+
+	tx, err := transactor.CreateTransaction(txnRequest)
+	if err != nil {
+		return nil, errors.WithMessage(err, "create transation failed")
+	}
+
+	response, err := transactor.SendTransaction(tx)
+	if err != nil {
+		return nil, errors.WithMessage(err, "send transation failed")
+	}
+	fmt.Println(response.Orderer)
 	return transactionProposalResponses, errs.ToError()
 }
