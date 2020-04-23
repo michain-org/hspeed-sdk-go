@@ -1,7 +1,6 @@
 package resmgmt
 
 import (
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -269,7 +268,7 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 		return nil, errors.Wrap(err, "failed to unmarshal to ApproveChaincodeDefinitionForMyOrgResult")
 	}
 
-	err = rc.submitProposal(proposal, channelID, options, proposalResponses)
+	_, err = rc.submitProposal(proposal, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
@@ -302,12 +301,12 @@ func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channe
 		return nil, errors.WithMessage(err, "failed to create approve proposal")
 	}
 
-	response := &lb.CommitChaincodeDefinitionResult{}
-	proposalResponses, err := rc.ProcessTransactionProposal(proposal, options)
+	proposalResponses, err := rc.submitProposal(proposal, channelID, options)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to send commit proposal")
 	}
 
+	response := &lb.CommitChaincodeDefinitionResult{}
 	if len(proposalResponses) == 0 {
 		return nil, errors.New("chaincode commit failed: received proposal response with nil response")
 
@@ -319,8 +318,6 @@ func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channe
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal to CommitChaincodeDefinitionResult")
 	}
-
-	err = rc.submitProposal(proposal, channelID, options, proposalResponses)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
@@ -385,7 +382,6 @@ func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, options []Re
 	var wg sync.WaitGroup
 	errs := multi.Errors{}
 	for _, p := range targets {
-		fmt.Println(p.URL())
 		wg.Add(1)
 		go func(processor fab.ProposalProcessor) {
 			defer wg.Done()
@@ -409,17 +405,23 @@ func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, options []Re
 	return transactionProposalResponses, errs.ToError()
 }
 
-func (rc *Client) submitProposal(proposal *pb.Proposal, channelID string, options []RequestOption, responses []*fab.TransactionProposalResponse) error {
+func (rc *Client) submitProposal(proposal *pb.Proposal, channelID string, options []RequestOption) ([]*fab.TransactionProposalResponse, error) {
 	opts, err := rc.prepareRequestOpts(options...)
 	if err != nil {
-		return errors.WithMessage(err, "failed to get opts for InstantiateCC")
+		return nil, errors.WithMessage(err, "failed to get opts for InstantiateCC")
 	}
 
 	reqCtx, cancel := rc.createRequestContext(opts, fab.ResMgmt)
 	defer cancel()
+
+	targets, err := rc.getCCProposalTargets(channelID, opts)
+	if err != nil {
+		return nil, errors.WithMessage(err, "failed to get targets")
+	}
+
 	txID, err := txn.NewHeader(rc.ctx, channelID)
 	if err != nil {
-		return errors.WithMessage(err, "create transaction ID failed")
+		return nil, errors.WithMessage(err, "create transaction ID failed")
 	}
 
 	txProposal := &fab.TransactionProposal{
@@ -427,29 +429,34 @@ func (rc *Client) submitProposal(proposal *pb.Proposal, channelID string, option
 		Proposal: proposal,
 	}
 
+	channelService, err := rc.ctx.ChannelProvider().ChannelService(rc.ctx, channelID)
+	if err != nil {
+		return nil, errors.WithMessage(err, "Unable to get channel service")
+	}
+
+	transactor, err := channelService.Transactor(reqCtx)
+	if err != nil {
+		return nil, errors.WithMessage(err, "get channel transactor failed")
+	}
+
+	responses, err := transactor.SendTransactionProposal(txProposal, peersToTxnProcessors(targets))
+	if err != nil {
+		return nil, errors.WithMessage(err, "send proposal failed")
+	}
+
 	txnRequest := fab.TransactionRequest{
 		Proposal:          txProposal,
 		ProposalResponses: responses,
 	}
 
-	channelService, err := rc.ctx.ChannelProvider().ChannelService(rc.ctx, channelID)
-	if err != nil {
-		return errors.WithMessage(err, "Unable to get channel service")
-	}
-
-	transactor, err := channelService.Transactor(reqCtx)
-	if err != nil {
-		return errors.WithMessage(err, "get channel transactor failed")
-	}
-
 	tx, err := transactor.CreateTransaction(txnRequest)
 	if err != nil {
-		return errors.WithMessage(err, "create transation failed")
+		return nil, errors.WithMessage(err, "create transation failed")
 	}
 
 	_, err = transactor.SendTransaction(tx)
 	if err != nil {
-		return errors.WithMessage(err, "send transation failed")
+		return nil, errors.WithMessage(err, "send transation failed")
 	}
-	return nil
+	return responses, nil
 }
