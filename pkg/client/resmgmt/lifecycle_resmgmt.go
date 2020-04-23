@@ -1,6 +1,7 @@
 package resmgmt
 
 import (
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -384,6 +385,7 @@ func (rc *Client) ProcessTransactionProposal(proposal *pb.Proposal, options []Re
 	var wg sync.WaitGroup
 	errs := multi.Errors{}
 	for _, p := range targets {
+		fmt.Println(p.URL())
 		wg.Add(1)
 		go func(processor fab.ProposalProcessor) {
 			defer wg.Done()
