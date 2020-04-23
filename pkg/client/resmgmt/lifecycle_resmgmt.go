@@ -1,6 +1,9 @@
 package resmgmt
 
 import (
+	reqContext "context"
+	"sync"
+
 	"github.com/golang/protobuf/proto"
 	cb "github.com/hyperledger/fabric-protos-go/common"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
@@ -11,7 +14,6 @@ import (
 	"github.com/michain-org/hspeed-sdk-go/pkg/common/providers/fab"
 	"github.com/michain-org/hspeed-sdk-go/pkg/fab/txn"
 	"github.com/pkg/errors"
-	"sync"
 )
 
 func (rc *Client) createProposal(input *pb.ChaincodeInput, channelID string, creator []byte) (*pb.Proposal, error) {
@@ -250,9 +252,9 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 		return nil, errors.WithMessage(err, "failed to create approve proposal")
 	}
 
-	proposalResponses, err := rc.ProcessTransactionProposal(proposal, options)
+	proposalResponses, err := rc.submitProposal(proposal, channelID, options)
 	if err != nil {
-		return nil, errors.WithMessage(err, "failed to send approve proposal")
+		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
 
 	response := &lb.ApproveChaincodeDefinitionForMyOrgResult{}
@@ -266,11 +268,6 @@ func (rc *Client) LifecycleApproveForMyOrg(args *lb.ApproveChaincodeDefinitionFo
 	err = proto.Unmarshal(proposalResponses[0].Response.Payload, response)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal to ApproveChaincodeDefinitionForMyOrgResult")
-	}
-
-	_, err = rc.submitProposal(proposal, channelID, options)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
 
 	return response, err
@@ -439,13 +436,22 @@ func (rc *Client) submitProposal(proposal *pb.Proposal, channelID string, option
 		return nil, errors.WithMessage(err, "get channel transactor failed")
 	}
 
-	responses, err := transactor.SendTransactionProposal(txProposal, peersToTxnProcessors(targets))
+	eventService, err := channelService.EventService()
+	if err != nil {
+		return nil, errors.WithMessage(err, "unable to get event service")
+	}
+
+	return rc.SendTransactionAndCheckEvent(eventService, transactor, reqCtx, targets, txProposal)
+}
+
+func (rc *Client) SendTransactionAndCheckEvent(service fab.EventService, transactor fab.Transactor, reqCtx reqContext.Context, targets []fab.Peer, proposal *fab.TransactionProposal) ([]*fab.TransactionProposalResponse, error) {
+	responses, err := transactor.SendTransactionProposal(proposal, peersToTxnProcessors(targets))
 	if err != nil {
 		return nil, errors.WithMessage(err, "send proposal failed")
 	}
 
 	txnRequest := fab.TransactionRequest{
-		Proposal:          txProposal,
+		Proposal:          proposal,
 		ProposalResponses: responses,
 	}
 
@@ -453,10 +459,22 @@ func (rc *Client) submitProposal(proposal *pb.Proposal, channelID string, option
 	if err != nil {
 		return nil, errors.WithMessage(err, "create transation failed")
 	}
-
+	reg, statusNotifier, err := service.RegisterTxStatusEvent(string(tx.Proposal.TxnID))
+	if err != nil {
+		return nil, errors.WithMessage(err, "error registering for TxStatus event")
+	}
+	defer service.Unregister(reg)
 	_, err = transactor.SendTransaction(tx)
 	if err != nil {
 		return nil, errors.WithMessage(err, "send transation failed")
 	}
-	return responses, nil
+	select {
+	case txStatus := <-statusNotifier:
+		if txStatus.TxValidationCode == pb.TxValidationCode_VALID {
+			return nil, errors.Errorf("tx[%s] execute failed", txStatus.TxID)
+		}
+		return responses, nil
+	case <-reqCtx.Done():
+		return nil, errors.New("Execute didn't receive block event")
+	}
 }
