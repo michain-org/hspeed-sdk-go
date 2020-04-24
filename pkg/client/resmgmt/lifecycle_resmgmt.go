@@ -284,7 +284,7 @@ func (rc *Client) signProposal(proposal *pb.Proposal, ctx context.Client) (*pb.S
 	}, nil
 }
 
-func (rc *Client) createProposal(argsBytes []byte, funcName string, channelID string, txID string) (*pb.Proposal, error) {
+func (rc *Client) createProposal(argsBytes []byte, funcName string, channelID string, txID *txn.TransactionHeader) (*pb.Proposal, error) {
 	serializedSigner, err := rc.ctx.Serialize()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to serialize signer")
@@ -298,7 +298,7 @@ func (rc *Client) createProposal(argsBytes []byte, funcName string, channelID st
 		},
 	}
 
-	proposal, _, err := protoutil.CreateChaincodeProposalWithTxIDAndTransient(cb.HeaderType_ENDORSER_TRANSACTION, channelID, cis, serializedSigner, txID, nil)
+	proposal, _, err := protoutil.CreateChaincodeProposalWithTxIDNonceAndTransient(string(txID.TransactionID()), cb.HeaderType_ENDORSER_TRANSACTION, channelID, cis, txID.Nonce(), serializedSigner, nil)
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to create proposal for ChaincodeInvocationSpec")
 	}
@@ -325,7 +325,7 @@ func (rc *Client) ProcessTransactionProposal(args []byte, funcName string, chann
 		return nil, errors.WithMessage(err, "create transaction ID failed")
 	}
 
-	proposal, _ := rc.createProposal(args, funcName, channelID, string(txID.TransactionID()))
+	proposal, _ := rc.createProposal(args, funcName, channelID, txID)
 
 	txProposal := &fab.TransactionProposal{
 		TxnID:    txID.TransactionID(),
@@ -369,7 +369,7 @@ func (rc *Client) submitProposal(args []byte, funcName string, channelID string,
 		return nil, errors.WithMessage(err, "create transaction ID failed")
 	}
 
-	proposal, _ := rc.createProposal(args, funcName, channelID, string(txID.TransactionID()))
+	proposal, _ := rc.createProposal(args, funcName, channelID, txID)
 
 	txProposal := &fab.TransactionProposal{
 		TxnID:    txID.TransactionID(),
