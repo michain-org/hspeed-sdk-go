@@ -86,7 +86,7 @@ func (rc *Client) NewCommitChaincodeDefinitionArgs(name string, v string, sequen
 }
 
 func (rc *Client) LifecycleInstall(args []byte, channelID string, options ...RequestOption) (*lb.InstallChaincodeResult, error) {
-	proposalResponses, err := rc.ProcessTransactionProposal(args, approveFuncName, channelID, options)
+	proposalResponses, err := rc.ProcessTransactionProposal(args, installFuncName, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
@@ -108,7 +108,7 @@ func (rc *Client) LifecycleInstall(args []byte, channelID string, options ...Req
 }
 
 func (rc *Client) LifecycleQueryInstalled(args []byte, channelID string, options ...RequestOption) (*lb.QueryInstalledChaincodeResult, error) {
-	proposalResponses, err := rc.submitProposal(args, approveFuncName, channelID, options)
+	proposalResponses, err := rc.submitProposal(args, queryInstalledFuncName, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
@@ -130,7 +130,7 @@ func (rc *Client) LifecycleQueryInstalled(args []byte, channelID string, options
 }
 
 func (rc *Client) LifecycleGetInstalledPackage(args []byte, channelID string, options ...RequestOption) (*lb.GetInstalledChaincodePackageResult, error) {
-	proposalResponses, err := rc.submitProposal(args, approveFuncName, channelID, options)
+	proposalResponses, err := rc.submitProposal(args, getInstalledPackageFuncName, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
