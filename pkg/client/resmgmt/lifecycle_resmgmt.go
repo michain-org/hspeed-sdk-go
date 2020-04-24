@@ -445,6 +445,13 @@ func (rc *Client) submitProposal(proposal *pb.Proposal, channelID string, option
 }
 
 func (rc *Client) SendTransactionAndCheckEvent(service fab.EventService, transactor fab.Transactor, reqCtx reqContext.Context, targets []fab.Peer, proposal *fab.TransactionProposal) ([]*fab.TransactionProposalResponse, error) {
+	// Register for commit event
+	reg, statusNotifier, err := service.RegisterTxStatusEvent(string(proposal.TxnID))
+	if err != nil {
+		return nil, errors.WithMessage(err, "error registering for TxStatus event")
+	}
+	defer service.Unregister(reg)
+
 	responses, err := transactor.SendTransactionProposal(proposal, peersToTxnProcessors(targets))
 	if err != nil {
 		return nil, errors.WithMessage(err, "send proposal failed")
@@ -459,22 +466,19 @@ func (rc *Client) SendTransactionAndCheckEvent(service fab.EventService, transac
 	if err != nil {
 		return nil, errors.WithMessage(err, "create transation failed")
 	}
-	reg, statusNotifier, err := service.RegisterTxStatusEvent(string(tx.Proposal.TxnID))
-	if err != nil {
-		return nil, errors.WithMessage(err, "error registering for TxStatus event")
-	}
-	defer service.Unregister(reg)
+
 	_, err = transactor.SendTransaction(tx)
 	if err != nil {
 		return nil, errors.WithMessage(err, "send transation failed")
 	}
+
 	select {
 	case txStatus := <-statusNotifier:
 		if txStatus.TxValidationCode == pb.TxValidationCode_VALID {
-			return nil, errors.Errorf("tx[%s] execute failed", txStatus.TxID)
+			return responses, nil
 		}
-		return responses, nil
+		return nil, errors.Errorf("tx[%s] execute failed", txStatus.TxID)
 	case <-reqCtx.Done():
-		return nil, errors.New("Execute didn't receive block event")
+		return nil, errors.New("Execute timed out or cancelled")
 	}
 }
