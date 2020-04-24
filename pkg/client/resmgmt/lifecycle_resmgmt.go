@@ -315,9 +315,7 @@ func (rc *Client) LifecycleCommit(args *lb.CommitChaincodeDefinitionArgs, channe
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal to CommitChaincodeDefinitionResult")
 	}
-	if err != nil {
-		return nil, errors.Wrap(err, "failed when submit proposal")
-	}
+
 	return response, err
 }
 
