@@ -203,7 +203,7 @@ func (rc *Client) LifecycleCheckCommitReadiness(args []byte, channelID string, o
 	return response, err
 }
 
-func (rc *Client) LifecycleCommitted(args []byte, channelID string, options ...RequestOption) (*lb.CommitChaincodeDefinitionResult, error) {
+func (rc *Client) LifecycleCommit(args []byte, channelID string, options ...RequestOption) (*lb.CommitChaincodeDefinitionResult, error) {
 	proposalResponses, err := rc.submitProposal(args, commitFuncName, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
