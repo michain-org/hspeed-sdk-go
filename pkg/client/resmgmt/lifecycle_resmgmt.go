@@ -225,13 +225,13 @@ func (rc *Client) LifecycleCommit(args []byte, channelID string, options ...Requ
 	return response, err
 }
 
-func (rc *Client) LifecycleQueryCommitted(args []byte, channelID string, options ...RequestOption) (*lb.QueryChaincodeDefinitionsArgs, error) {
+func (rc *Client) LifecycleQueryCommitted(args []byte, channelID string, options ...RequestOption) (*lb.QueryChaincodeDefinitionsResult, error) {
 	proposalResponses, err := rc.ProcessTransactionProposal(args, queryChaincodesFuncName, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
 
-	response := &lb.QueryChaincodeDefinitionsArgs{}
+	response := &lb.QueryChaincodeDefinitionsResult{}
 	if len(proposalResponses) == 0 {
 		return nil, errors.New("chaincode approve failed: received proposal response with nil response")
 
@@ -247,13 +247,13 @@ func (rc *Client) LifecycleQueryCommitted(args []byte, channelID string, options
 	return response, err
 }
 
-func (rc *Client) LifecycleQueryCommittedWithName(args []byte, channelID string, options ...RequestOption) (*lb.QueryChaincodeDefinitionArgs, error) {
+func (rc *Client) LifecycleQueryCommittedWithName(args []byte, channelID string, options ...RequestOption) (*lb.QueryChaincodeDefinitionResult, error) {
 	proposalResponses, err := rc.ProcessTransactionProposal(args, queryChaincodeFuncName, channelID, options)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed when submit proposal")
 	}
 
-	response := &lb.QueryChaincodeDefinitionArgs{}
+	response := &lb.QueryChaincodeDefinitionResult{}
 	if len(proposalResponses) == 0 {
 		return nil, errors.New("chaincode approve failed: received proposal response with nil response")
 
