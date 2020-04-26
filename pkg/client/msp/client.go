@@ -338,11 +338,12 @@ func (c *Client) Enroll(enrollmentID string, opts ...EnrollmentOption) error {
 	req := &mspapi.EnrollmentRequest{
 		Name:    enrollmentID,
 		Secret:  eo.secret,
-		CAName:  c.caName,
+		CAName:  eo.caName,
 		Profile: eo.profile,
 		Type:    eo.typ,
 		Label:   eo.label,
 		CSR:     createCSRInfo(eo.csr),
+		ORG:     eo.org,
 	}
 
 	if req.CAName == "" {
@@ -486,6 +487,25 @@ func (c *Client) GetCAInfo() (*GetCAInfoResponse, error) {
 func (c *Client) GetSigningIdentity(id string) (mspctx.SigningIdentity, error) {
 	im, _ := c.ctx.IdentityManager(c.orgName)
 	si, err := im.GetSigningIdentity(id)
+	if err != nil {
+		if err == mspctx.ErrUserNotFound {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+	return si, nil
+}
+
+// GetCASigningIdentity returns signing identity for id
+//  Parameters:
+//  caName name of ca
+//  id is user id
+//
+//  Returns:
+//  signing identity
+func (c *Client) GetCASigningIdentity(caName,id string) (mspctx.SigningIdentity, error) {
+	im, _ := c.ctx.IdentityManager(c.orgName)
+	si, err := im.GetCASigningIdentity(caName,id)
 	if err != nil {
 		if err == mspctx.ErrUserNotFound {
 			return nil, ErrUserNotFound
@@ -677,6 +697,7 @@ func createCSRInfo(csr *CSRInfo) *mspapi.CSRInfo {
 	return &mspapi.CSRInfo{
 		CN:    csr.CN,
 		Hosts: csr.Hosts,
+		Names: csr.Names,
 	}
 }
 

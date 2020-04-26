@@ -57,9 +57,34 @@ func (mgr *IdentityManager) loadUserFromStore(username string) (*User, error) {
 	return user, nil
 }
 
+func (mgr *IdentityManager) loadCAUserFromStore(caName, username string) (*User, error) {
+	if mgr.userStore == nil {
+		return nil, msp.ErrUserNotFound
+	}
+	var user *User
+	userData, err := mgr.userStore.Load(msp.IdentityIdentifier{MSPID: caName, ID: username})
+	if err != nil {
+		return nil, err
+	}
+	user, err = mgr.NewUser(userData)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 // GetSigningIdentity returns a signing identity for the given id
 func (mgr *IdentityManager) GetSigningIdentity(id string) (msp.SigningIdentity, error) {
 	user, err := mgr.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+// GetSigningIdentity returns a signing identity for the given id
+func (mgr *IdentityManager) GetCASigningIdentity(caName, id string) (msp.SigningIdentity, error) {
+	user, err := mgr.GetCAUser(caName, id)
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +125,55 @@ func (mgr *IdentityManager) CreateSigningIdentity(opts ...msp.SigningIdentityOpt
 		enrollmentCertificate: opt.Cert,
 		privateKey:            privateKey,
 	}, nil
+}
+
+// GetUser returns a user for the given user name
+func (mgr *IdentityManager) GetCAUser(caName, username string) (*User, error) { //nolint
+
+	u, err := mgr.loadCAUserFromStore(caName, username)
+	if err != nil {
+		if err != msp.ErrUserNotFound {
+			return nil, errors.WithMessage(err, "loading user from store failed")
+		}
+		// Not found, continue
+	}
+
+	if u == nil {
+		certBytes := mgr.getEmbeddedCertBytes(username)
+		if certBytes == nil {
+			certBytes, err = mgr.getCertBytesFromCertStore(username)
+			if err != nil && err != msp.ErrUserNotFound {
+				return nil, errors.WithMessage(err, "fetching cert from store failed")
+			}
+		}
+		if certBytes == nil {
+			return nil, msp.ErrUserNotFound
+		}
+		privateKey, err := mgr.getEmbeddedPrivateKey(username)
+		if err != nil {
+			return nil, errors.WithMessage(err, "fetching embedded private key failed")
+		}
+		if privateKey == nil {
+			privateKey, err = mgr.getPrivateKeyFromCert(username, certBytes)
+			if err != nil {
+				return nil, errors.WithMessage(err, "getting private key from cert failed")
+			}
+		}
+		if privateKey == nil {
+			return nil, fmt.Errorf("unable to find private key for user [%s]", username)
+		}
+		mspID, ok := comm.MSPID(mgr.config, mgr.orgName)
+		if !ok {
+			return nil, errors.New("MSP ID config read failed")
+		}
+		u = &User{
+			id:                    username,
+			mspID:                 mspID,
+			enrollmentCertificate: certBytes,
+			privateKey:            privateKey,
+		}
+	}
+	return u, nil
 }
 
 // GetUser returns a user for the given user name

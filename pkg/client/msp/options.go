@@ -23,6 +23,8 @@ type enrollmentOptions struct {
 	profile  string
 	label    string
 	typ      string
+	caName   string
+	org      string
 	attrReqs []*AttributeRequest
 	csr      *CSRInfo
 }
@@ -64,6 +66,22 @@ type EnrollmentOption func(*enrollmentOptions) error
 func WithSecret(secret string) EnrollmentOption {
 	return func(o *enrollmentOptions) error {
 		o.secret = secret
+		return nil
+	}
+}
+
+// WithTargetCA enrollment option
+func WithTargetCA(caName string) EnrollmentOption {
+	return func(o *enrollmentOptions) error {
+		o.caName = caName
+		return nil
+	}
+}
+
+// WithORG enrollment option
+func WithORG(org string) EnrollmentOption {
+	return func(o *enrollmentOptions) error {
+		o.org = org
 		return nil
 	}
 }

@@ -46,6 +46,8 @@ func WithCert(cert []byte) SigningIdentityOption {
 // IdentityManager provides management of identities in Fabric network
 type IdentityManager interface {
 	GetSigningIdentity(name string) (SigningIdentity, error)
+	GetCASigningIdentity(org,name string) (SigningIdentity, error)
+
 	CreateSigningIdentity(ops ...SigningIdentityOption) (SigningIdentity, error)
 }
 

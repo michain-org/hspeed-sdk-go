@@ -50,7 +50,7 @@ func (c *fabricCAAdapter) Enroll(request *api.EnrollmentRequest) ([]byte, error)
 
 	// TODO add attributes
 	careq := &caapi.EnrollmentRequest{
-		CAName:  c.caClient.Config.CAName,
+		CAName:  request.CAName,
 		Name:    request.Name,
 		Secret:  request.Secret,
 		Profile: request.Profile,
@@ -543,6 +543,7 @@ func createCSRInfo(csr *api.CSRInfo) *caapi.CSRInfo {
 	return &caapi.CSRInfo{
 		CN:    csr.CN,
 		Hosts: csr.Hosts,
+		Names: csr.Names,
 	}
 }
 
